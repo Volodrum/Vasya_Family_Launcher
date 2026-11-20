@@ -30,6 +30,7 @@ import {
 } from '@xmcl/installer'
 import type { GameEvent, PackManifest, PlayMode, Settings, Stage } from '../shared/types'
 import { USER_AGENT, paths } from './paths'
+import { guardJvmArgs } from './guard'
 
 export type Report = (stage: Stage, fraction: number, detail?: string) => void
 
@@ -153,10 +154,12 @@ export interface LaunchArgs {
   mode: PlayMode
   javaPath: string
   version: ResolvedVersion
+  /** SHA-1s of the mod jars that are in the mods folder for this launch (signed for the server's guard mod). */
+  modSha1s: string[]
   onEvent: (e: GameEvent) => void
 }
 
-export async function launchGame({ manifest, settings, mode, javaPath, version, onEvent }: LaunchArgs): Promise<ChildProcess> {
+export async function launchGame({ manifest, settings, mode, javaPath, version, modSha1s, onEvent }: LaunchArgs): Promise<ChildProcess> {
   const server = mode === 'server' ? (manifest.servers.find((s) => s.id === settings.serverId) ?? manifest.servers[0]) : undefined
   const logDir = join(paths.instance, 'logs')
   await mkdir(logDir, { recursive: true })
@@ -177,7 +180,14 @@ export async function launchGame({ manifest, settings, mode, javaPath, version, 
     launcherName: 'vasya-family-launcher',
     launcherBrand: 'VasyaFamily',
     versionName: manifest.name,
-    extraJVMArgs: ['-XX:+UseG1GC', '-XX:+UnlockExperimentalVMOptions', '-XX:G1NewSizePercent=20', '-XX:MaxGCPauseMillis=50'],
+    extraJVMArgs: [
+      '-XX:+UseG1GC',
+      '-XX:+UnlockExperimentalVMOptions',
+      '-XX:G1NewSizePercent=20',
+      '-XX:MaxGCPauseMillis=50',
+      // Proof for the server's Vasya Family Guard mod that this launcher started the game (src/main/guard.ts).
+      ...guardJvmArgs(settings.nickname, modSha1s)
+    ],
     extraExecOption: { detached: true }
   })
 

@@ -1,7 +1,7 @@
 {
   "name": "vasya-family-launcher",
   "productName": "Vasya Family Launcher",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Launcher for the Vasya Family Minecraft server: keeps the modpack in sync and checks game files.",
   "author": "Vasya Family",
   "license": "MIT",

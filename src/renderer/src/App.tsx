@@ -53,10 +53,12 @@ export function App(): React.JSX.Element {
       if (e.type === 'error') pushToast({ kind: 'error', title: tRef.current('stage.error'), body: e.message })
     })
     const offUpdate = window.vf.onUpdate((e) => {
+      if (e.type === 'available') pushToast({ kind: 'info', title: tRef.current('toast.updating', { v: e.version ?? '' }) })
       if (e.type === 'downloaded') {
         pushToast({
           kind: 'update',
           title: tRef.current('toast.update', { v: e.version ?? '' }),
+          body: tRef.current('toast.updateHint'),
           action: { label: tRef.current('toast.restart'), run: () => void window.vf.installUpdate() }
         })
       }

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "vasyafamily_guard",
+  "version": "${version}",
+  "name": "Vasya Family Guard",
+  "description": "Lets only games started by the Vasya Family launcher join the server. Install on the server and in the launcher pack.",
+  "authors": ["Vasya Family"],
+  "contact": { "sources": "https://github.com/Volodrum/Vasya_Family_Launcher" },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "client": ["ua.vasyafamily.guard.GuardClient"],
+    "server": ["ua.vasyafamily.guard.GuardServer"]
+  },
+  "mixins": ["vasyafamily_guard.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.14.21",
+    "minecraft": "~1.20.1",
+    "java": ">=17",
+    "fabric-networking-api-v1": "*",
+    "fabric-lifecycle-events-v1": "*",
+    "fabric-command-api-v2": "*"
+  }
+}

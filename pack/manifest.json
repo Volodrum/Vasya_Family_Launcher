@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "name": "Vasya Family S1",
-  "packVersion": "20261120T174646",
-  "generatedAt": "2026-11-20T17:46:46.403Z",
+  "packVersion": "20261120T184600",
+  "generatedAt": "2026-11-20T18:46:00.404Z",
   "minecraft": "1.20.1",
   "loader": {
     "type": "fabric",
@@ -806,6 +806,26 @@
         "type": "modrinth",
         "projectId": "5aaWibi9",
         "versionId": "AHxQGtuC"
+      }
+    },
+    {
+      "id": "vasyafamily_guard",
+      "name": "Vasya Family Guard",
+      "version": "1.0.0",
+      "file": "vasyafamily-guard-1.0.0.jar",
+      "size": 33255,
+      "sha1": "30fbe4b2ad6d73fdb7fb66dd93a0a571f9cfb71a",
+      "sha512": "b80c961c80a9d01a13ddae2c8a912c0ea34df8f600d064e9f4d738455113d7dbe3a03635c660842590cb9dbcabcb5ba9594800a1f161df13feb02fd5532377e6",
+      "side": "both",
+      "optional": false,
+      "default": true,
+      "requires": [],
+      "downloads": [
+        "https://github.com/Volodrum/Vasya_Family_Launcher/releases/download/pack-files/30fbe4b2ad6d73fdb7fb66dd93a0a571f9cfb71a.jar"
+      ],
+      "source": {
+        "type": "github-release",
+        "asset": "30fbe4b2ad6d73fdb7fb66dd93a0a571f9cfb71a.jar"
       }
     },
     {

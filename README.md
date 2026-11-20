@@ -6,6 +6,7 @@ Launcher for the Vasya Family Minecraft server (Fabric 1.20.1).
 - Keeps the modpack in sync. Before every start the `mods` folder is made to match the pack exactly: new mods are downloaded, changed ones are re-downloaded, and any unknown jars are deleted.
 - Optional client-side mods (Sodium, Iris, sounds, animations...) can be switched on and off in Settings.
 - Nickname login for offline accounts. Passwords are handled on the server by EasyAuth (`/register`, `/login`).
+- Launcher-only joining: with the Vasya Family Guard mod on the server, a game started some other way (TLauncher with its own mods, an outdated pack) is turned away. See [below](#launcher-only-joining-vasya-family-guard).
 - English / Українська / Русский.
 - Updates itself from GitHub Releases.
 
@@ -25,6 +26,8 @@ Environment variables for development (ignored in the installed app):
 | `VF_MANIFEST_FILE` | Use a local manifest file instead of the one on GitHub, e.g. `pack/manifest.json`. |
 | `VF_DATA_DIR` | Keep settings and game files in this folder instead of `%APPDATA%\.vasyafamily`. |
 | `VF_AUTOPLAY=1` | Start the install and launch as soon as the window opens, and log progress to the console. |
+| `VF_AUTOPLAY=server` | The same, but join the first server in the manifest. Use only with a test `VF_MANIFEST_FILE` whose server list points at a local server. |
+| `VF_GUARD_SECRET` | Shared secret for the guard mod, read **at build time** (also by `npm run dev`). See below. |
 
 ## Updating the modpack
 
@@ -52,14 +55,48 @@ Environment variables for development (ignored in the installed app):
 
 ## Releasing a new launcher version
 
-1. Bump `version` in `package.json`.
-2. Create a GitHub token with `repo` access and run:
+1. Bump `version` in `package.json`. Make sure `guard.secret` is present (see below), or the build warns that it can't join a guarded server.
+2. Publish it. If the `gh` CLI is logged in, it can supply the token:
    ```powershell
-   $env:GH_TOKEN = "<token>"; npm run release
+   $env:GH_TOKEN = (gh auth token); npm run release
    ```
-   This builds `dist/VasyaFamilyLauncher-Setup-<version>.exe` and publishes it with `latest.yml` to GitHub Releases. Installed launchers download it in the background and offer to restart.
+   (Or use a GitHub token with `repo` access instead of `(gh auth token)`.)
+   This builds `dist/VasyaFamilyLauncher-Setup-<version>.exe` and publishes it with `latest.yml` to GitHub Releases.
+
+**How players get updates:** the launcher checks GitHub Releases at start-up and every 2 hours, downloads a newer
+version in the background, and shows a toast with a Restart button. If the player ignores it, the update installs the
+next time the launcher closes. Only full releases count; the `pack-files` pre-release is ignored.
+Each release needs a higher `version` than the last one, or installed launchers won't see it.
+
+Modpack changes don't need a launcher release: pushing `pack/manifest.json` is enough.
 
 `npm run dist` builds the installer without publishing.
+
+## Launcher-only joining (Vasya Family Guard)
+
+`guard-mod/` is a small Fabric mod (client and server in one jar) that lets only games started by this launcher join the server.
+
+1. On every start the launcher signs the nickname, the launch time and the SHA-1 list of the mod jars it installed, using a shared secret,
+   and passes the result to the game as `-Dvasyafamily.guard=...` (`src/main/guard.ts`). Only a key derived from the secret reaches the game, not the secret itself.
+2. When a player joins, the server sends a random challenge over the login channel. The mod answers with the signed data and the SHA-1s of the jars it actually loaded.
+3. The server checks the signature for that nickname, the age of the launch, that the loaded jars are the ones the launcher signed, and that they all belong to the current `pack/manifest.json`.
+   Otherwise it disconnects the player with a message in English, Ukrainian and Russian.
+
+**The secret.** The launcher reads it at build time from `VF_GUARD_SECRET` or from the file `guard.secret` next to `package.json`. The file is git-ignored; never commit it.
+It must equal `secret` in the server's `config/vasyafamily-guard.properties`, which the server generates on first start.
+Without a secret the launcher still works, but a server with the guard turned on refuses it.
+
+**Limits.** This blocks casual bypassing only. Anyone can unpack the launcher and find the secret, or rebuild the mod to report a fake mod list.
+
+**Building the mod** (needs JDK 17 or newer; the Gradle wrapper downloads everything else):
+
+```powershell
+cd guard-mod; .gradlew.bat build
+```
+
+The jar is `guard-mod/build/libs/vasyafamily-guard-<version>.jar`. The build is reproducible: the same source gives the same SHA-1.
+Copy it into `pack/mods/` and run `npm run pack:build`. It isn't on Modrinth, so it needs `npm run pack:build -- --upload` to put it on the `pack-files` release.
+Put the same jar on the server. Server setup and the rollout order are in [server/SERVER_SETUP.md](server/SERVER_SETUP.md#5-vasya-family-guard-only-the-launcher-may-join).
 
 ## Where things live on a player's PC
 
@@ -72,4 +109,4 @@ Environment variables for development (ignored in the installed app):
 
 ## Server
 
-See [server/SERVER_SETUP.md](server/SERVER_SETUP.md) for EasyAuth, AntiXray, Ledger and JourneyMap.
+See [server/SERVER_SETUP.md](server/SERVER_SETUP.md) for EasyAuth, AntiXray, Ledger, JourneyMap and the Vasya Family Guard mod.

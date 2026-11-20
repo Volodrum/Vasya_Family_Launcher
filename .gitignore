@@ -8,3 +8,6 @@ dist/
 pack/mods/
 pack/replaced/
 *.tsbuildinfo
+
+# Shared secret for the Vasya Family Guard server mod (see README). Never commit it.
+guard.secret

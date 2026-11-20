@@ -12,7 +12,9 @@ If you ever change one of them, change the other too.
 
 ## 1. EasyAuth: passwords for offline accounts
 
-File: `easyauth-mc1.20-3.5.1.jar` (server-only, works on 1.20–1.20.1). Requires Fabric API, which the server already has.
+File: `easyauth-mc1.20-3.4.4.jar` (https://modrinth.com/mod/easyauth/version/3.4.4, server-only, works on 1.20–1.20.1). Requires Fabric API, which the server already has.
+
+> **Use 3.4.4, not 3.5.1.** EasyAuth 3.5.1 for 1.20 is compiled for Java 25 (its mixin config asks for `JAVA_25`), so on the server's Java 21 it crashes at startup with a Mixin error. 3.4.4 needs only Java 21 and has the same commands.
 
 Right now the server is in offline mode with no password plugin, so **anyone can join as any admin**. Do this step first.
 
@@ -100,8 +102,67 @@ Useful commands: `/ledger inspect` (click blocks to see their history), `/ledger
 Cave mapping and the mob/player radar are left on for everyone (owner's decision).
 If that ever needs to change: as an op, open JourneyMap in game → Options → **Server Admin**, and turn them off for regular players.
 
-## 5. Launcher-only joining (later)
+## 5. Vasya Family Guard: only the launcher may join
 
-The launcher removes unknown mods before every start. A player can still skip the launcher and start the game some other way (for example, with TLauncher and their own mods).
-To close that gap, a small companion mod will be added to both the server and the pack. The launcher gives the game a one-time token, the mod sends it when joining, and the server kicks anyone who can't show a valid token.
-This is planned as the next step and is not installed yet.
+The launcher removes unknown mods before every start, but a player could skip it and start the game some other way
+(for example TLauncher with their own mods). The **Vasya Family Guard** mod closes that gap.
+It is our own mod (source in `guard-mod/`), file `vasyafamily-guard-1.0.0.jar`. The same jar goes on the server and into the launcher pack.
+
+How it works: every time the launcher starts the game it passes a one-time proof, signed with a secret that only the launcher build and the server know.
+It covers the nickname, the launch time and the exact list of mod jars the launcher installed.
+When someone joins, the server asks the game for that proof and also checks that every loaded mod jar is in the current pack.
+Anyone who can't answer is disconnected with a message, in English, Ukrainian and Russian, that tells them to use the launcher:
+- no guard mod or no proof (vanilla, TLauncher, another launcher): "Please join through the Vasya Family launcher";
+- mods were added, removed or are outdated: "Your mods don't match the server's modpack...";
+- the game was started more than `maxSessionHours` ago, or the PC clock is far off: "Your game session has expired...".
+
+> **Limits.** This stops casual bypassing, not a determined cheater. The secret is inside every copy of the launcher,
+> so someone who unpacks the launcher, or rewrites this mod to lie about its mod list, can get past it.
+> EasyAuth, AntiXray and Ledger are still needed.
+
+### Install
+
+Do it in this order, or every player gets kicked:
+
+1. Stop the server, put `vasyafamily-guard-1.0.0.jar` into the server's `mods/`, and start it.
+   It creates `config/vasyafamily-guard.properties` with **`enabled=false`** and a random `secret=`.
+2. Copy the `secret` value. On the PC that builds the launcher, save it in a file named `guard.secret` next to `package.json`
+   (the file is git-ignored; never commit it or post it in chat). Another option is to set the `VF_GUARD_SECRET` environment variable.
+3. Make sure the guard jar is in the launcher pack (`pack/mods`, then `npm run pack:build`; see the README) and release a new launcher version.
+   The build prints a `[guard]` warning if it can't find the secret.
+4. When players have the new launcher (it updates itself), set `enabled=true` in the config and run `vfguard reload` in the console.
+
+If you ever change the secret, you have to release a new launcher with the same value.
+
+### Config: `config/vasyafamily-guard.properties`
+
+| Setting | Meaning |
+| --- | --- |
+| `enabled` | `true` turns the check on. With `false`, everyone can join as before. |
+| `secret` | Shared secret; must match the launcher build exactly. |
+| `bypass` | Nicknames that may join without the launcher, comma-separated, case doesn't matter. Use it for admins who play from another launcher. EasyAuth still asks them for their password, so a stranger can't use a bypassed nickname. |
+| `maxSessionHours` | How long one launch may keep joining (default 12). Reconnecting, or going from singleplayer to the server, reuses the same launch. |
+| `checkMods` | `true` (default): every loaded jar must be in the current pack, and no required pack mod may be missing. Optional mods (Sodium, Iris...) may be on or off. |
+| `manifestUrls` | Where the pack list is read from (the same `pack/manifest.json` the launcher uses). It is re-read every `manifestRefreshMinutes`. The last good copy is cached in `config/vasyafamily-guard-manifest.json`. |
+| `manifestFile` | A local manifest file to use instead of the URLs. |
+| `launcherUrl` | Download link shown in the kick message. |
+
+If the pack list can't be downloaded and there is no cached copy, the server still checks the launcher proof but not the mod list, and writes a warning in the log.
+
+### Commands (console without `/`, or ops with `/`)
+
+| Command | What it does |
+| --- | --- |
+| `vfguard status` | Shows whether the check is on, the pack version it knows, and the bypass list |
+| `vfguard reload` | Re-reads the config and the pack list after you edit them |
+
+Every join is logged, for example `Steve passed the launcher check (pack 20261120T..., 38 mods)`
+or `Kicked Steve: loaded mods differ from what the launcher installed`, so you can see why someone couldn't join.
+
+### When the pack changes
+
+Nothing to do on the server. Push the new `pack/manifest.json`, and within `manifestRefreshMinutes` the server starts asking for the new pack.
+Players who are still in a game started before the update are asked to restart through the launcher the next time they join.
+Players who are online stay online.
+
+If the guard mod itself changes, put the new jar on the server too.

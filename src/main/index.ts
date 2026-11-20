@@ -27,7 +27,7 @@ function send(channel: string, payload: unknown): void {
 let lastLogged = ''
 const progress = (e: ProgressEvent): void => {
   send('vf:progress', e)
-  if (process.env.VF_AUTOPLAY === '1') {
+  if (process.env.VF_AUTOPLAY) {
     // Log stage changes and every ~10% so a headless test run can be followed.
     const line = `${e.stage} ${e.fraction < 0 ? '...' : Math.floor(e.fraction * 10) * 10 + '%'} ${e.detail ?? ''}`
     if (line !== lastLogged) console.log('[progress]', (lastLogged = line))
@@ -72,7 +72,9 @@ async function play(mode: PlayMode | 'repair'): Promise<void> {
     const javaPath = await ensureJava(m, report, repair)
     const version = await ensureMinecraft(m, report, repair)
 
-    await syncMods(paths.mods, selectMods(m, settings), (fraction, detail) => report('mods', fraction, detail))
+    const wanted = selectMods(m, settings)
+    const sync = await syncMods(paths.mods, wanted, (fraction, detail) => report('mods', fraction, detail))
+    const installed = wanted.filter((mod) => !sync.skipped.includes(mod.name))
     await mkdir(join(paths.instance, 'resourcepacks'), { recursive: true })
     await mkdir(join(paths.instance, 'shaderpacks'), { recursive: true })
 
@@ -88,6 +90,7 @@ async function play(mode: PlayMode | 'repair'): Promise<void> {
       mode,
       javaPath,
       version,
+      modSha1s: installed.map((mod) => mod.sha1),
       onEvent: (e: GameEvent) => {
         if (e.type === 'started') {
           gameRunning = true
@@ -102,7 +105,7 @@ async function play(mode: PlayMode | 'repair'): Promise<void> {
             win.focus()
           }
         }
-        if (process.env.VF_AUTOPLAY === '1') console.log('[game]', JSON.stringify(e).slice(0, 500))
+        if (process.env.VF_AUTOPLAY) console.log('[game]', JSON.stringify(e).slice(0, 500))
         send('vf:game', e)
       }
     })
@@ -136,18 +139,37 @@ function registerIpc(): void {
     await mkdir(dir, { recursive: true })
     await shell.openPath(dir)
   })
-  ipcMain.handle('vf:installUpdate', () => autoUpdater.quitAndInstall())
+  // Restarting mid-install would leave a half-downloaded game; in that case it installs on quit instead.
+  ipcMain.handle('vf:installUpdate', () => {
+    if (!busy) autoUpdater.quitAndInstall(true, true)
+  })
   ipcMain.on('vf:minimize', () => win?.minimize())
   ipcMain.on('vf:close', () => win?.close())
 }
 
+/**
+ * Launcher self-update from GitHub Releases (the newest full release; the `pack-files`
+ * pre-release is ignored). Updates download in the background; the player can restart
+ * right away from the toast, or the update installs the next time the launcher closes.
+ */
 function setupUpdater(): void {
   if (!app.isPackaged) return
   autoUpdater.autoDownload = true
-  autoUpdater.on('update-available', (i) => send('vf:update', { type: 'available', version: i.version } satisfies UpdateEvent))
+  autoUpdater.autoInstallOnAppQuit = true
+  autoUpdater.allowPrerelease = false
+  let announced = ''
+  autoUpdater.on('update-available', (i) => {
+    if (announced === i.version) return
+    announced = i.version
+    send('vf:update', { type: 'available', version: i.version } satisfies UpdateEvent)
+  })
   autoUpdater.on('update-downloaded', (i) => send('vf:update', { type: 'downloaded', version: i.version } satisfies UpdateEvent))
-  autoUpdater.on('error', (err) => send('vf:update', { type: 'error', message: err.message } satisfies UpdateEvent))
-  void autoUpdater.checkForUpdates().catch(() => undefined)
+  // Offline or GitHub unreachable: stay quiet and try again at the next check.
+  autoUpdater.on('error', (err) => console.warn('[updater]', err.message))
+  const check = (): void => void autoUpdater.checkForUpdates().catch(() => undefined)
+  check()
+  // A launcher left open (e.g. hidden while playing) still notices new versions.
+  setInterval(check, 2 * 60 * 60 * 1000)
 }
 
 function createWindow(): void {
@@ -215,10 +237,13 @@ function createWindow(): void {
   }
 
   // Development aid: VF_AUTOPLAY=1 starts the full install + launch without clicking.
-  if (!app.isPackaged && process.env.VF_AUTOPLAY === '1') {
+  // VF_AUTOPLAY=server joins the first server in the manifest instead: use it only with a test
+  // VF_MANIFEST_FILE whose server list points at a local test server.
+  const autoplay = !app.isPackaged ? process.env.VF_AUTOPLAY : undefined
+  if (autoplay === '1' || autoplay === 'server') {
     win.webContents.once('did-finish-load', () => {
-      // Singleplayer mode, so a test run never joins the real server.
-      play('local').catch((e) => console.error('[autoplay]', e))
+      // Singleplayer by default, so a test run never joins the real server.
+      play(autoplay === 'server' ? 'server' : 'local').catch((e) => console.error('[autoplay]', e))
     })
   }
 }
