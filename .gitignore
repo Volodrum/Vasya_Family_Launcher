@@ -1,0 +1,10 @@
+node_modules/
+out/
+dist/
+*.log
+
+# Mod jars are large and are downloaded by the launcher from Modrinth / the pack-files release.
+# Keep your local copy here to run `npm run pack:build`, but don't commit it.
+pack/mods/
+pack/replaced/
+*.tsbuildinfo

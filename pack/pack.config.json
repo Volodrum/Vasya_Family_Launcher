@@ -1,0 +1,39 @@
+{
+  "$comment": "Input for tools/build-manifest.mjs. Edit this, drop jars into pack/mods, run `npm run pack:build`, commit pack/manifest.json.",
+  "name": "Vasya Family S1",
+  "minecraft": "1.20.1",
+  "loader": { "type": "fabric", "version": "0.20.1" },
+  "java": { "component": "java-runtime-gamma", "major": 17 },
+  "servers": [
+    { "id": "main", "name": "Vasya Family", "address": "vasyafamily.sahur.win" },
+    { "id": "anycast", "name": "Anycast proxy", "address": "lefinlomeanmor.peniscraft.pro" },
+    { "id": "direct", "name": "Direct IP", "address": "95.216.92.67:25970" }
+  ],
+  "selfHost": {
+    "$comment": "Mods that are not found on Modrinth are uploaded to this GitHub release (named by SHA-1) and downloaded from here.",
+    "repo": "Volodrum/Vasya_Family_Launcher",
+    "tag": "pack-files"
+  },
+  "policy": {
+    "mods": "strict",
+    "resourcepacks": "any",
+    "shaderpacks": "any"
+  },
+  "overrides": {
+    "$comment": "Per-mod settings, keyed by mod id. optional/default/name/extraDownloads override what the tool detects.",
+    "sound_physics_remastered": { "optional": true, "default": true },
+    "customskinloader-bootstrap": { "name": "CustomSkinLoader (skins)" },
+    "cultivaria": {
+      "$comment": "CurseForge file 9544819",
+      "downloads": ["https://mediafilez.forgecdn.net/files/9544/819/cultivaria-1.20.1-fabric-3.1.1-1.20.1.jar"]
+    },
+    "ftblibrary": {
+      "$comment": "CurseForge file 8226926",
+      "downloads": ["https://mediafilez.forgecdn.net/files/8226/926/ftb-library-fabric-2001.2.13.jar"]
+    },
+    "ftbteams": {
+      "$comment": "CurseForge file 7499808",
+      "downloads": ["https://mediafilez.forgecdn.net/files/7499/808/ftb-teams-fabric-2001.3.2.jar"]
+    }
+  }
+}

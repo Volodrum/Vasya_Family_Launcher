@@ -1,0 +1,45 @@
+{
+  "name": "vasya-family-launcher",
+  "productName": "Vasya Family Launcher",
+  "version": "0.1.0",
+  "description": "Launcher for the Vasya Family Minecraft server: keeps the modpack in sync and checks game files.",
+  "author": "Vasya Family",
+  "license": "MIT",
+  "private": true,
+  "main": "./out/main/index.js",
+  "scripts": {
+    "postinstall": "node tools/fix-deps.mjs",
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
+    "pack:build": "node tools/build-manifest.mjs",
+    "dist": "electron-vite build && electron-builder --win --publish never",
+    "release": "electron-vite build && electron-builder --win --publish always"
+  },
+  "overrides": {
+    "@xmcl/yauzl": "2.10.0"
+  },
+  "devDependencies": {
+    "@fontsource/tiny5": "^5.3.0",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "adm-zip": "^0.6.1",
+    "electron": "^45.4.1",
+    "electron-builder": "^26.18.0",
+    "electron-vite": "^6.0.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.8"
+  },
+  "dependencies": {
+    "@xmcl/core": "^2.16.3",
+    "@xmcl/file-transfer": "^2.1.4",
+    "@xmcl/installer": "^6.3.7",
+    "electron-updater": "^6.8.11",
+    "undici": "^7.30.2"
+  }
+}
