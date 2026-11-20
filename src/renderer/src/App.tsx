@@ -4,6 +4,7 @@ import { NICKNAME_RE } from '../../shared/types'
 import { LANGUAGES, SPLASHES, stageKey, translate, type Key } from './i18n'
 import { CycleButton, McButton, McCheckbox, McSlider, Toasts, type Toast } from './ui'
 import { headFor } from './textures'
+import { renderBody, renderHead, useRendered, useSkin } from './skin'
 import banner from './assets/season1.webp'
 
 type T = (key: Key, vars?: Record<string, string | number>) => string
@@ -205,14 +206,17 @@ function TitleScreen(props: {
   }, [lang])
   const servers = state.manifest?.servers ?? []
   const server = servers.find((s) => s.id === state.settings.serverId) ?? servers[0]
-  const head = useMemo(() => headFor(state.settings.nickname), [state.settings.nickname])
+  // Real skin face when the nickname has one (Mojang / Ely.by), otherwise a generated face.
+  const fallbackHead = useMemo(() => headFor(state.settings.nickname), [state.settings.nickname])
+  const skinHead = useRendered(useSkin(state.settings.nickname), renderHead)
+  const head = skinHead ?? fallbackHead
 
   return (
     <main className="title-screen">
       <div className="player-chip">
         <img className="head" src={head} alt="" width={36} height={36} />
         <span className="player-name">{state.settings.nickname}</span>
-        <McButton small onClick={props.onChangeNick} disabled={locked}>
+        <McButton small onClick={props.onChangeNick} disabled={locked} testId="change-nick">
           {t('title.change')}
         </McButton>
       </div>
@@ -404,6 +408,8 @@ function NicknameScreen(props: {
   useEscape(props.canCancel ? props.onCancel : () => undefined)
   return (
     <main className="sub-screen">
+      <div className="nick-layout">
+      <SkinPreview t={t} nickname={valid ? nick : ''} />
       <form
         className="nick-form"
         onSubmit={(e) => {
@@ -441,7 +447,30 @@ function NicknameScreen(props: {
           <code>/login &lt;{t('login.authPassword')}&gt;</code>
         </div>
       </form>
+      </div>
     </main>
+  )
+}
+
+/** Full-body preview of the skin that belongs to the typed nickname (no login needed). */
+function SkinPreview({ t, nickname }: { t: T; nickname: string }): React.JSX.Element {
+  const skin = useSkin(nickname, 450)
+  const body = useRendered(skin, renderBody)
+  const caption = !nickname
+    ? t('skin.enterName')
+    : skin === undefined
+      ? t('skin.loading')
+      : skin
+        ? t(skin.source === 'mojang' ? 'skin.mojang' : 'skin.ely')
+        : t('skin.none')
+  return (
+    <aside className="skin-preview" aria-live="polite">
+      <div className={`skin-stage ${body ? '' : 'empty'}`}>
+        {body ? <img src={body} alt={caption} width={112} height={224} /> : <span className="skin-placeholder">?</span>}
+      </div>
+      <span className="skin-caption">{caption}</span>
+      <span className="skin-hint">{t('skin.hint')}</span>
+    </aside>
   )
 }
 

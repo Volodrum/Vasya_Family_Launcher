@@ -8,6 +8,7 @@ import { fetchManifest, selectMods } from './manifest'
 import { syncMods } from './mods'
 import { ensureJava, ensureMinecraft, launchGame } from './game'
 import { paths } from './paths'
+import { getSkin } from './skins'
 
 const { autoUpdater } = electronUpdater
 
@@ -119,6 +120,7 @@ async function play(mode: PlayMode | 'repair'): Promise<void> {
 
 function registerIpc(): void {
   ipcMain.handle('vf:getState', () => state())
+  ipcMain.handle('vf:getSkin', (_e, nickname: unknown) => (typeof nickname === 'string' ? getSkin(nickname) : null))
   ipcMain.handle('vf:saveSettings', (_e, patch: Partial<Settings>) => saveSettings(patch))
   ipcMain.handle('vf:refreshManifest', async () => {
     await loadManifest()
@@ -231,6 +233,12 @@ function createWindow(): void {
         progress({ stage: 'error', fraction: 0, detail: 'Could not download Tech Reborn: cdn.modrinth.com: HTTP 503' })
         await wait(800)
         await shot('5-error')
+        report('idle', 1)
+        await wait(300)
+        if (await click('change-nick')) {
+          await wait(3500)
+          await shot('6-nickname')
+        }
       }
       app.quit()
     })

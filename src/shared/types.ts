@@ -96,7 +96,15 @@ export interface LauncherState {
   gameRunning: boolean
 }
 
+/** A player's skin, found by nickname (no login). `png` is a data: URL of the skin image. */
+export interface SkinInfo {
+  png: string
+  slim: boolean
+  source: 'mojang' | 'ely.by'
+}
+
 export interface LauncherApi {
+  getSkin(nickname: string): Promise<SkinInfo | null>
   getState(): Promise<LauncherState>
   saveSettings(patch: Partial<Settings>): Promise<Settings>
   refreshManifest(): Promise<LauncherState>

@@ -9,6 +9,7 @@ function listen<T>(channel: string, cb: (payload: T) => void): () => void {
 
 const api: LauncherApi = {
   getState: () => ipcRenderer.invoke('vf:getState'),
+  getSkin: (nickname) => ipcRenderer.invoke('vf:getSkin', nickname),
   saveSettings: (patch) => ipcRenderer.invoke('vf:saveSettings', patch),
   refreshManifest: () => ipcRenderer.invoke('vf:refreshManifest'),
   play: (mode) => ipcRenderer.invoke('vf:play', mode),
