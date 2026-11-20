@@ -10,7 +10,7 @@ asar: true
 win:
   target: nsis
   artifactName: VasyaFamilyLauncher-Setup-${version}.${ext}
-  # Put a 256x256 (or larger) build/icon.png here to replace the default Electron icon.
+  # App icon: build/icon.png (512x512, rendered from the Season 1 banner).
 nsis:
   oneClick: true
   perMachine: false
