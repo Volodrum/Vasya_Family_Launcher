@@ -6,6 +6,7 @@ import { CycleButton, McButton, McCheckbox, McSlider, Toasts, type Toast } from 
 import { headFor } from './textures'
 import { renderBody, renderHead, useRendered, useSkin } from './skin'
 import banner from './assets/season1.webp'
+import logo from './assets/logo.png'
 
 type T = (key: Key, vars?: Record<string, string | number>) => string
 type Screen = 'title' | 'options' | 'mods'
@@ -160,7 +161,7 @@ function TitleBar({ t }: { t: T }): React.JSX.Element {
   return (
     <header className="titlebar">
       <div className="titlebar-brand">
-        <span className="brand-mark">VF</span>
+        <img className="brand-mark" src={logo} alt="" width={22} height={22} />
         Vasya Family Launcher
       </div>
       <div className="titlebar-controls">

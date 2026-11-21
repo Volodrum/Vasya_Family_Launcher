@@ -10,6 +10,7 @@ import { syncPacks } from './packs'
 import { ensureJava, ensureMinecraft, launchGame } from './game'
 import { paths } from './paths'
 import { getSkin } from './skins'
+import icon from '../../build/icon.ico?asset'
 
 const { autoUpdater } = electronUpdater
 
@@ -192,6 +193,7 @@ function createWindow(): void {
     backgroundColor: '#120818',
     show: false,
     title: 'Vasya Family Launcher',
+    icon,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,

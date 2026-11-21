@@ -10,12 +10,16 @@ asar: true
 win:
   target: nsis
   artifactName: VasyaFamilyLauncher-Setup-${version}.${ext}
-  # App icon: build/icon.png (512x512, rendered from the Season 1 banner).
+  # App icon: the pixel "double-rim V" logo, drawn by tools/make-icon.mjs (build/icon.ico, build/icon.png).
+  icon: build/icon.ico
 nsis:
   oneClick: true
   perMachine: false
   createDesktopShortcut: always
   createStartMenuShortcut: true
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
+  installerHeaderIcon: build/icon.ico
   shortcutName: Vasya Family Launcher
 publish:
   provider: github
