@@ -6,6 +6,7 @@ import type { GameEvent, LauncherState, PackManifest, PlayMode, ProgressEvent, S
 import { loadSettings, saveSettings, totalMemoryMb } from './settings'
 import { fetchManifest, selectMods } from './manifest'
 import { syncMods } from './mods'
+import { syncPacks } from './packs'
 import { ensureJava, ensureMinecraft, launchGame } from './game'
 import { paths } from './paths'
 import { getSkin } from './skins'
@@ -78,6 +79,13 @@ async function play(mode: PlayMode | 'repair'): Promise<void> {
     const installed = wanted.filter((mod) => !sync.skipped.includes(mod.name))
     await mkdir(join(paths.instance, 'resourcepacks'), { recursive: true })
     await mkdir(join(paths.instance, 'shaderpacks'), { recursive: true })
+    // Resource packs and shaders from the pack; a failed download never blocks the game.
+    try {
+      const packs = await syncPacks(m, paths.instance, join(paths.state, 'packs.json'), (fraction, detail) => report('packs', fraction, detail))
+      if (packs.failed.length) console.warn('[packs] could not download:', packs.failed.join(', '))
+    } catch (e) {
+      console.warn('[packs]', (e as Error).message)
+    }
 
     if (mode === 'repair') {
       report('idle', 1)

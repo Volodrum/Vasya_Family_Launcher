@@ -20,6 +20,23 @@ export interface ModEntry {
   source?: { type: string; [key: string]: unknown }
 }
 
+/** A resource pack or shader pack the launcher installs next to the player's own packs. */
+export interface PackFileEntry {
+  /** Stable id (Modrinth project slug or file stem); lets a renamed update replace the old file. */
+  id: string
+  name: string
+  version: string
+  file: string
+  size: number
+  sha1: string
+  sha512?: string
+  /** Tried in order; every download is checked against sha1. */
+  downloads: string[]
+  source?: { type: string; [key: string]: unknown }
+  /** Resource packs only: switched on the first time the launcher installs it. */
+  enabled?: boolean
+}
+
 export interface ServerEntry {
   id: string
   name: string
@@ -41,6 +58,12 @@ export interface PackManifest {
     shaderpacks: 'any' | 'whitelist' | 'none'
   }
   mods: ModEntry[]
+  /** Installed into resourcepacks/, listed bottom-to-top (the last one has the highest priority). Players' own packs are left alone. */
+  resourcepacks?: PackFileEntry[]
+  /** Installed into shaderpacks/. */
+  shaderpacks?: PackFileEntry[]
+  /** First-run shader choice: which pack Iris selects and whether shaders start on. */
+  shaders?: { default?: string; enabled?: boolean }
 }
 
 export interface Settings {
@@ -63,6 +86,7 @@ export type Stage =
   | 'loader'
   | 'assets'
   | 'mods'
+  | 'packs'
   | 'launching'
   | 'running'
   | 'error'

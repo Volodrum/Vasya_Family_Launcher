@@ -11,3 +11,7 @@ pack/replaced/
 
 # Shared secret for the Vasya Family Guard server mod (see README). Never commit it.
 guard.secret
+
+# Resource packs and shaders shipped with the pack (downloaded by the launcher, like mods).
+pack/resourcepacks/
+pack/shaderpacks/

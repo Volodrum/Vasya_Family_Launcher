@@ -271,7 +271,7 @@ function LoadingPanel({ t, progress, running }: { t: T; progress: ProgressEvent;
   const indeterminate = !running && progress.fraction < 0
   const sub = running
     ? t('stage.runningHint')
-    : progress.stage === 'mods' && progress.detail && progress.detail !== 'verify'
+    : (progress.stage === 'mods' || progress.stage === 'packs') && progress.detail && progress.detail !== 'verify'
       ? progress.detail
       : ' '
   return (

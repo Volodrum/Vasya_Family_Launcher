@@ -19,6 +19,24 @@
     "resourcepacks": "any",
     "shaderpacks": "any"
   },
+  "resourcepacks": {
+    "$comment": "Zips in pack/resourcepacks, listed bottom to top (last = highest priority). 'enabled' packs are switched on the first time a player gets them; afterwards the player's own choice wins. Players can still add their own packs.",
+    "order": [
+      { "file": "Vanilla Experience+ v2.0.zip", "enabled": true },
+      { "file": "Simple Grass Flowers v2.0.0.zip", "enabled": true },
+      { "file": "Better-Leaves-9.6.zip", "enabled": true },
+      { "file": "Fancy Crops v1.3.zip", "enabled": true },
+      { "file": "TechReborn-Vanilla-Machines-1.5.zip", "enabled": true, "id": "techreborn-vanilla-machines", "name": "Tech Reborn: Vanilla Machines", "version": "1.5" },
+      { "file": "Fluid & Foolish 1.0.1.zip", "enabled": true },
+      { "file": "Default-Dark-Mode-1.20-2023.7.0.zip", "enabled": false },
+      { "file": "LowOnFire v26.2.zip", "enabled": false }
+    ]
+  },
+  "shaderpacks": {
+    "$comment": "Zips in pack/shaderpacks. 'default' is selected in Iris the first time; 'enabled' decides whether shaders start on.",
+    "default": "superDuperVanilla.zip",
+    "enabled": false
+  },
   "overrides": {
     "$comment": "Per-mod settings, keyed by mod id. optional/default/name/extraDownloads override what the tool detects.",
     "sound_physics_remastered": { "optional": true, "default": true },

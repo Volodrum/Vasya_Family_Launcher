@@ -120,7 +120,7 @@ const entries = mods.map((m) => {
   } else {
     downloads.push(selfBase + `${m.sha1}.jar`)
     source = { type: 'github-release', asset: `${m.sha1}.jar` }
-    toUpload.push(m)
+    toUpload.push({ src: join(modsDir, m.file), asset: `${m.sha1}.jar`, file: m.file })
   }
   for (const url of ov.extraDownloads ?? []) downloads.push(url)
 
@@ -162,6 +162,67 @@ if (serverOnly.length) {
   console.warn(`Skipping server-only mods (they belong on the server, not in the client pack): ${serverOnly.map((e) => e.file).join(', ')}`)
 }
 
+// ---- resource packs and shader packs (pack/resourcepacks, pack/shaderpacks) ----
+// Same rules as mods: Modrinth when the exact file is published there, otherwise the pack-files release.
+// pack.config.json lists resource packs bottom-to-top with whether each starts switched on.
+async function readPackDir(kind, list) {
+  const dir = join(root, 'pack', kind)
+  let files = []
+  try {
+    files = readdirSync(dir).filter((f) => f.toLowerCase().endsWith('.zip'))
+  } catch {
+    return []
+  }
+  const order = (list ?? []).map((e) => (typeof e === 'string' ? { file: e } : e))
+  for (const f of files.sort()) if (!order.some((o) => o.file === f)) order.push({ file: f })
+  const items = order.filter((o) => {
+    if (files.includes(o.file)) return true
+    throw new Error(`pack.config.json lists ${kind}/${o.file}, but the file is not in pack/${kind}`)
+  }).map((o) => {
+    const buf = readFileSync(join(dir, o.file))
+    return { ...o, src: join(dir, o.file), size: buf.length, sha1: createHash('sha1').update(buf).digest('hex'), sha512: createHash('sha512').update(buf).digest('hex') }
+  })
+  if (!items.length) return []
+  const found = await lookupModrinth(items.map((i) => i.sha1))
+  const ids = [...new Set(Object.values(found).map((v) => v.project_id))]
+  const projects = ids.length
+    ? await (await fetch(`https://api.modrinth.com/v2/projects?ids=${encodeURIComponent(JSON.stringify(ids))}`, { headers: { 'user-agent': UA } })).json()
+    : []
+  return items.map((i) => {
+    const mr = found[i.sha1]
+    const mrFile = mr?.files?.find((f) => f.hashes?.sha1 === i.sha1)
+    const project = mr && projects.find((p) => p.id === mr.project_id)
+    const downloads = []
+    let source
+    if (mrFile) {
+      downloads.push(mrFile.url)
+      source = { type: 'modrinth', projectId: mr.project_id, versionId: mr.id }
+    } else {
+      downloads.push(selfBase + `${i.sha1}.zip`)
+      source = { type: 'github-release', asset: `${i.sha1}.zip` }
+      toUpload.push({ src: i.src, asset: `${i.sha1}.zip`, file: `${kind}/${i.file}` })
+    }
+    const entry = {
+      id: i.id ?? project?.slug ?? i.file.replace(/\.zip$/i, '').replace(/[ _-]*v?\d[\w.+-]*$/i, '').toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      name: i.name ?? project?.title ?? i.file.replace(/\.zip$/i, ''),
+      version: mr?.version_number ?? i.version ?? '',
+      file: i.file,
+      size: i.size,
+      sha1: i.sha1,
+      sha512: i.sha512,
+      downloads,
+      source
+    }
+    if (kind === 'resourcepacks') entry.enabled = !!i.enabled
+    return entry
+  })
+}
+const resourcepacks = await readPackDir('resourcepacks', config.resourcepacks?.order)
+const shaderpacks = await readPackDir('shaderpacks', config.shaderpacks?.order)
+if (config.shaderpacks?.default && !shaderpacks.some((s) => s.file === config.shaderpacks.default)) {
+  throw new Error(`Default shader ${config.shaderpacks.default} is not in pack/shaderpacks`)
+}
+
 const now = new Date()
 const manifest = {
   schema: 1,
@@ -175,7 +236,10 @@ const manifest = {
   policy: config.policy,
   mods: entries
     .filter((e) => e.side !== 'server')
-    .map(({ _depends, _provided, _src, ...rest }) => rest)
+    .map(({ _depends, _provided, _src, ...rest }) => rest),
+  resourcepacks,
+  shaderpacks,
+  shaders: { default: config.shaderpacks?.default, enabled: !!config.shaderpacks?.enabled }
 }
 
 writeFileSync(outFile, JSON.stringify(manifest, null, 2) + '\n')
@@ -185,6 +249,7 @@ console.log(`  ${manifest.mods.length} mods, ${optional.length} optional: ${opti
 const bySource = {}
 for (const m of manifest.mods) bySource[m.source.type] = (bySource[m.source.type] ?? 0) + 1
 console.log(`  sources: ${Object.entries(bySource).map(([k, v]) => `${v} ${k}`).join(', ')}`)
+console.log(`  ${resourcepacks.length} resource packs (${resourcepacks.filter((p) => p.enabled).length} on by default), ${shaderpacks.length} shader packs (default ${manifest.shaders.default ?? 'none'}, ${manifest.shaders.enabled ? 'on' : 'off'})`)
 if (toUpload.length) console.log(`  waiting for upload to the GitHub release: ${toUpload.map((m) => m.file).join(', ')}`)
 
 if (toUpload.length && flag('--upload')) {
@@ -203,9 +268,9 @@ if (toUpload.length && flag('--upload')) {
   }
   const staging = join(tmpdir(), `vf-upload-${Date.now()}`)
   mkdirSync(staging, { recursive: true })
-  const paths = toUpload.map((m) => {
-    const p = join(staging, `${m.sha1}.jar`)
-    copyFileSync(join(modsDir, m.file), p)
+  const paths = toUpload.map((u) => {
+    const p = join(staging, u.asset)
+    copyFileSync(u.src, p)
     return p
   })
   execFileSync('gh', ['release', 'upload', tag, ...paths, '--repo', repo, '--clobber'], { stdio: 'inherit' })

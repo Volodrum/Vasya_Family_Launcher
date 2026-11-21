@@ -53,6 +53,24 @@ Environment variables for development (ignored in the installed app):
 
 `pack/pack.config.json` also holds the Minecraft / Fabric versions, the server addresses shown in the launcher, and per-mod overrides (`optional`, `default`, `name`).
 
+### Resource packs and shaders
+
+Since launcher 1.1.0 the pack can also ship resource packs and shader packs. Put the zips in `pack/resourcepacks/` and
+`pack/shaderpacks/` (not committed, like `pack/mods/`) and run `npm run pack:build`. They are found on Modrinth by
+SHA-1 the same way as mods; anything else goes to the `pack-files` release with `--upload`.
+
+In `pack/pack.config.json`:
+
+- `resourcepacks.order` lists the resource packs bottom to top (the last one wins). `"enabled": true` switches a
+  pack on the first time a player gets it. `id`, `name` and `version` can be set for packs that aren't on Modrinth;
+  keep the `id` the same across versions so an update replaces the old file.
+- `shaderpacks.default` is the shader Iris selects on a player's first start, and `shaderpacks.enabled` decides
+  whether shaders start on.
+
+The launcher never touches the player's own packs. It only adds the pack's files, replaces them on update, and
+removes files it installed itself that the pack no longer lists. Defaults are applied once, so if a player turns
+a pack off or picks another shader in the game, it stays that way. Older launchers ignore these lists.
+
 ## Releasing a new launcher version
 
 1. Bump `version` in `package.json`. Make sure `guard.secret` is present (see below), or the build warns that it can't join a guarded server.
@@ -105,6 +123,7 @@ Put the same jar on the server. Server setup and the rollout order are in [serve
 | `%APPDATA%\.vasyafamily\instance` | Game folder: mods, config, saves, resource packs, shader packs, screenshots, logs |
 | `%APPDATA%\.vasyafamily\minecraft` | Minecraft versions, libraries, assets |
 | `%APPDATA%\.vasyafamily\java` | Java runtime |
+| `%APPDATA%\.vasyafamily\state\packs.json` | Which resource / shader pack files the launcher installed, and which defaults it already applied |
 | `%APPDATA%\Vasya Family Launcher\settings.json` | Launcher settings |
 
 ## Server

@@ -17,6 +17,15 @@ function validate(m: unknown): PackManifest {
       throw new Error(`Bad file name in manifest: ${mod.file}`)
     }
   }
+  for (const p of [...(x.resourcepacks ?? []), ...(x.shaderpacks ?? [])]) {
+    if (!p.file || !p.id || !/^[0-9a-f]{40}$/.test(p.sha1) || !p.downloads?.length) {
+      throw new Error(`Manifest entry for pack ${p.id ?? '?'} is incomplete`)
+    }
+    // Same rule as mods: a pack must stay inside its folder.
+    if (/[\\/]|\.\./.test(p.file) || !p.file.toLowerCase().endsWith('.zip')) {
+      throw new Error(`Bad pack file name in manifest: ${p.file}`)
+    }
+  }
   return x
 }
 

@@ -15,7 +15,10 @@ export function sha1File(file: string): Promise<string> {
   })
 }
 
-async function isValid(file: string, mod: ModEntry): Promise<boolean> {
+/** Anything the launcher downloads and verifies: mods, resource packs, shader packs. */
+export type Downloadable = Pick<ModEntry, 'name' | 'sha1' | 'size' | 'downloads'>
+
+export async function isValid(file: string, mod: Downloadable): Promise<boolean> {
   try {
     const s = await stat(file)
     if (!s.isFile() || s.size !== mod.size) return false
@@ -26,7 +29,7 @@ async function isValid(file: string, mod: ModEntry): Promise<boolean> {
 }
 
 /** Tries each URL in turn; only a file with the expected SHA-1 is accepted. */
-async function downloadMod(mod: ModEntry, dest: string, onBytes: (n: number) => void): Promise<void> {
+export async function downloadMod(mod: Downloadable, dest: string, onBytes: (n: number) => void): Promise<void> {
   const errors: string[] = []
   for (const url of mod.downloads) {
     let received = 0

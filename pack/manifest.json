@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "name": "Vasya Family S1",
-  "packVersion": "20261120T184600",
-  "generatedAt": "2026-11-20T18:46:00.404Z",
+  "packVersion": "20261121T101105",
+  "generatedAt": "2026-11-21T10:11:05.012Z",
   "minecraft": "1.20.1",
   "loader": {
     "type": "fabric",
@@ -849,5 +849,275 @@
         "versionId": "1K7XoPeL"
       }
     }
-  ]
+  ],
+  "resourcepacks": [
+    {
+      "id": "vanilla-exp",
+      "name": "Vanilla Experience+",
+      "version": "v2.0",
+      "file": "Vanilla Experience+ v2.0.zip",
+      "size": 2079306,
+      "sha1": "6b2031d2f682c068f8c7515f186dfe39d9dd3c5a",
+      "sha512": "1911e4ddd16348c974bd551f19b1074e3d7db8647bd483da65752f411ab829479d8605ba6a5fdf783ab1250711dc2e2a3a55094b484b1549595a1103457fbac8",
+      "downloads": [
+        "https://cdn.modrinth.com/data/8bf2GogI/versions/McEoZ3lo/%C2%A76%C2%A7lVanilla%20Experience%2B%C2%A70.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "8bf2GogI",
+        "versionId": "McEoZ3lo"
+      },
+      "enabled": true
+    },
+    {
+      "id": "simple-grass-flowers",
+      "name": "Simple Grass Flowers",
+      "version": "2.0.0",
+      "file": "Simple Grass Flowers v2.0.0.zip",
+      "size": 208597,
+      "sha1": "afb56cfc90e663526352f7bd75a3c733178fca45",
+      "sha512": "9ad752e71feb8fea4ccf2ecb23eecb85d48285e95744f28902bf505423a849a2ff74da6273982e7d38f7ea74385c67a9c188beaff38dae6e23473fbbd8bc11b5",
+      "downloads": [
+        "https://cdn.modrinth.com/data/ti9KkMHm/versions/Cd4Xa7Sr/Simple%20Grass%20Flowers%20v2.0.0.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "ti9KkMHm",
+        "versionId": "Cd4Xa7Sr"
+      },
+      "enabled": true
+    },
+    {
+      "id": "better-leaves",
+      "name": "Motschen's Better Leaves",
+      "version": "9.6",
+      "file": "Better-Leaves-9.6.zip",
+      "size": 1977146,
+      "sha1": "fa3a961b82a9f15a4e80b1f7f021bc121649f073",
+      "sha512": "793dacaca4c200656e8875195e42975ecb628af114e13aad2059368b51cf45f00280f86075368e9adf492e847718a9d593bdf481664e10cf1aa9628d2a51a8d6",
+      "downloads": [
+        "https://cdn.modrinth.com/data/uvpymuxq/versions/w4ReEpuG/Better-Leaves-9.6.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "uvpymuxq",
+        "versionId": "w4ReEpuG"
+      },
+      "enabled": true
+    },
+    {
+      "id": "fancy-crops",
+      "name": "(Bee's) Fancy Crops",
+      "version": "1.3",
+      "file": "Fancy Crops v1.3.zip",
+      "size": 92779,
+      "sha1": "788e5169eb064b696b2e20d4c5d998cceb387a2e",
+      "sha512": "ce8e34ce76f5368169722f9949edf372af5d9e1d3c262395006a5a1561ed7bae1259b9d69e4838914d637817f611283bfaf8be07c7b45b317fd2bdb22f32b7e3",
+      "downloads": [
+        "https://cdn.modrinth.com/data/UGEVQ6t9/versions/ZJEBZjg6/Fancy%20Crops%20v1.3.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "UGEVQ6t9",
+        "versionId": "ZJEBZjg6"
+      },
+      "enabled": true
+    },
+    {
+      "id": "techreborn-vanilla-machines",
+      "name": "Tech Reborn: Vanilla Machines",
+      "version": "1.5",
+      "file": "TechReborn-Vanilla-Machines-1.5.zip",
+      "size": 297850,
+      "sha1": "6333d492cdce5176a02fb7b63f7570ab4564152a",
+      "sha512": "83deb57d01e0b2d73866a95214d11cb91d77464b9e170c056fd5857d3c724a605a7be9c524e94eeef17a1561aea66f68c28c5e6ee62a8a0a45c51edebf7e240b",
+      "downloads": [
+        "https://github.com/Volodrum/Vasya_Family_Launcher/releases/download/pack-files/6333d492cdce5176a02fb7b63f7570ab4564152a.zip"
+      ],
+      "source": {
+        "type": "github-release",
+        "asset": "6333d492cdce5176a02fb7b63f7570ab4564152a.zip"
+      },
+      "enabled": true
+    },
+    {
+      "id": "fluid-foolish",
+      "name": "Fluid & Foolish",
+      "version": "1.0.1",
+      "file": "Fluid & Foolish 1.0.1.zip",
+      "size": 1881476,
+      "sha1": "45a52f5456bc56686e1587dcc182c3e4601baec8",
+      "sha512": "09544efccdb63bbd6a2f583184bea82cfe01c78cd36f9bf9343cd8cc0243b19d7993aa280481d42c68c4b19e6abb3b52346d93115d48b50e1e37be9c53efafb9",
+      "downloads": [
+        "https://cdn.modrinth.com/data/fQdwNxte/versions/UAp4jRDk/Fluid%20%26%20Foolish%201.0.1.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "fQdwNxte",
+        "versionId": "UAp4jRDk"
+      },
+      "enabled": true
+    },
+    {
+      "id": "default-dark-mode",
+      "name": "Default Dark Mode",
+      "version": "2023.7.0-1.20",
+      "file": "Default-Dark-Mode-1.20-2023.7.0.zip",
+      "size": 664752,
+      "sha1": "fc488eca9d771b6bd7ce5c651793d812a0adb1ae",
+      "sha512": "52012b320a1d6e7c5c1e391cd475cc8d733b954a99f227131c2a7271198b403c3e2ce06cbfacb61328936c7618792a6a6a6ce557a1f82bbf95232e19dec1306e",
+      "downloads": [
+        "https://cdn.modrinth.com/data/6SLU7tS5/versions/SEAHWiIS/Default-Dark-Mode-1.20-2023.7.0.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "6SLU7tS5",
+        "versionId": "SEAHWiIS"
+      },
+      "enabled": false
+    },
+    {
+      "id": "low-on-fire",
+      "name": "Low On Fire",
+      "version": "26.3",
+      "file": "LowOnFire v26.2.zip",
+      "size": 42760,
+      "sha1": "96932a034fff4cd0cad08ba12db730450c4772da",
+      "sha512": "713a20a8171c8249c30d9eb72342162754c627c7a86dc0971cb555faf43c322c181fd5546e0c770fc9ae922161ee846a7af951267c1d9a8a75af466a17e19d5e",
+      "downloads": [
+        "https://cdn.modrinth.com/data/RRxvWKNC/versions/yQdcUfnr/LowOnFire%20v26.2%C2%A78.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "RRxvWKNC",
+        "versionId": "yQdcUfnr"
+      },
+      "enabled": false
+    }
+  ],
+  "shaderpacks": [
+    {
+      "id": "complementary-reimagined",
+      "name": "Complementary Shaders - Reimagined",
+      "version": "r5.10",
+      "file": "ComplementaryReimagined_r5.10.zip",
+      "size": 567387,
+      "sha1": "ce5f303920c12f858c6b4c27a521fe7a1ba70aea",
+      "sha512": "edced01fb330af215ac73b8d9d31011565089f971f87145b87f413f40ee2128b48970aed26f8e5e879899647ec847b3eefca64bfc013aabbcf25275a207f663d",
+      "downloads": [
+        "https://cdn.modrinth.com/data/HVnmMxH1/versions/RKfUB9VC/ComplementaryReimagined_r5.10.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "HVnmMxH1",
+        "versionId": "RKfUB9VC"
+      }
+    },
+    {
+      "id": "i-like-vanilla",
+      "name": "I Like Vanilla",
+      "version": "v1.5.0b",
+      "file": "I Like Vanilla v1.5.0b.zip",
+      "size": 334513,
+      "sha1": "d681b1555f28b521f1967a8e8ed84f8c281a7aba",
+      "sha512": "8a6594acb04e15f068fe73f023f1a37ef35a3d7f4247d9eed48a56ee07b0796726d745a908cbf89ffa34e99003bec119b2a259b2f235cb578923838c60595105",
+      "downloads": [
+        "https://cdn.modrinth.com/data/DoODk4HD/versions/lrndU3YJ/I%20Like%20Vanilla%20v1.5.0b.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "DoODk4HD",
+        "versionId": "lrndU3YJ"
+      }
+    },
+    {
+      "id": "nostalgia-shader",
+      "name": "Nostalgia Shader",
+      "version": "5.1",
+      "file": "Nostalgia_v5.1.zip",
+      "size": 1842205,
+      "sha1": "c93900007773ce0314539461e26aa8faadf4aec9",
+      "sha512": "9a15161da2e360bcc446bfeb5163a2b4e70e49b46545ccbdde05540a46d861a7a378c243769faeabca76019e75cb1e55b1b2c04f74b8aaa23b86d436ebbb034c",
+      "downloads": [
+        "https://cdn.modrinth.com/data/xEItlMn3/versions/fzxeGgx7/Nostalgia_v5.1.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "xEItlMn3",
+        "versionId": "fzxeGgx7"
+      }
+    },
+    {
+      "id": "vanilla-advanced",
+      "name": "Vanilla Advanced",
+      "version": "1.0.1",
+      "file": "VanillaAdvanced.zip",
+      "size": 13873,
+      "sha1": "377b421137995ac8ba21287b0e07043c3a7f6d67",
+      "sha512": "82814411cd7ab3623b30d37720dfb105efbda8975e7a386c0e401aa33cb7ec4d662f2862fe0c472e6398964d88689e799b020cd522f1582893f9f6c4a3181e96",
+      "downloads": [
+        "https://cdn.modrinth.com/data/wPjAoRh5/versions/I2tgEwzw/VanillaAdvanced.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "wPjAoRh5",
+        "versionId": "I2tgEwzw"
+      }
+    },
+    {
+      "id": "vanilla-plus-shader",
+      "name": "Vanilla Plus Shader",
+      "version": "3.3",
+      "file": "VanillaPlus_v3.3.zip",
+      "size": 445002,
+      "sha1": "e3e6d764cfb598fc4d0e62c6dd99f1211037ee38",
+      "sha512": "b9ef99f06781fd0c0b867e4415bee2020dbc6ad4538c87f176c76e4b8528a1df56aaf22c0c30624f3c68a230970c83c70e1e04fdc733289f7acf1238abca66d9",
+      "downloads": [
+        "https://cdn.modrinth.com/data/EPsIYDj1/versions/U3rhmRqW/VanillaPlus_v3.3.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "EPsIYDj1",
+        "versionId": "U3rhmRqW"
+      }
+    },
+    {
+      "id": "miniature-shader",
+      "name": "Miniature Shader",
+      "version": "2.19",
+      "file": "miniature-shader-2.19.zip",
+      "size": 43913,
+      "sha1": "f66501ebcc5197f72ef19065eb0fa851707d7f9f",
+      "sha512": "bc2d9f3d135e8608f4735e5372b893e17cdc630b7536ec1e0b9a4d2734167d1a2102e60de60731d21d8a9741cec1a82530d03bf634b7e7cf9a0f107077c0e7fa",
+      "downloads": [
+        "https://cdn.modrinth.com/data/UaS8ROxa/versions/LWmZ94RG/miniature-shader-2.19.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "UaS8ROxa",
+        "versionId": "LWmZ94RG"
+      }
+    },
+    {
+      "id": "super-duper-vanilla",
+      "name": "Super Duper Vanilla",
+      "version": "1.3.8",
+      "file": "superDuperVanilla.zip",
+      "size": 2851664,
+      "sha1": "f2d6d259368e8b8d8807abb1ac28aaa7cff85b8c",
+      "sha512": "231b47716d5dab68fd1409c65750589c234d4d63312b3f8634342477686ae6db88edb9ecc3c5662fca245e71b16f16e2933e50751d13d5b06e7d3e26f8d9ebaf",
+      "downloads": [
+        "https://cdn.modrinth.com/data/LMIZZNxZ/versions/KB0sOLSc/superDuperVanilla.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "LMIZZNxZ",
+        "versionId": "KB0sOLSc"
+      }
+    }
+  ],
+  "shaders": {
+    "default": "superDuperVanilla.zip",
+    "enabled": false
+  }
 }
