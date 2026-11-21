@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "name": "Vasya Family S1",
-  "packVersion": "20261121T101105",
-  "generatedAt": "2026-11-21T10:11:05.012Z",
+  "packVersion": "20261121T151917",
+  "generatedAt": "2026-11-21T15:19:17.083Z",
   "minecraft": "1.20.1",
   "loader": {
     "type": "fabric",
@@ -926,17 +926,17 @@
     {
       "id": "techreborn-vanilla-machines",
       "name": "Tech Reborn: Vanilla Machines",
-      "version": "1.5",
-      "file": "TechReborn-Vanilla-Machines-1.5.zip",
-      "size": 297850,
-      "sha1": "6333d492cdce5176a02fb7b63f7570ab4564152a",
-      "sha512": "83deb57d01e0b2d73866a95214d11cb91d77464b9e170c056fd5857d3c724a605a7be9c524e94eeef17a1561aea66f68c28c5e6ee62a8a0a45c51edebf7e240b",
+      "version": "1.6",
+      "file": "TechReborn-Vanilla-Machines-1.6.zip",
+      "size": 313475,
+      "sha1": "092b593813ccfae1791044316d8ccddbf9d7851e",
+      "sha512": "276764a28679b1af93808b1eaf3b521666999e29f4c451a4bef41ced6a3c4c65bdff825a56399332c118bfa21439ee986dea4c97c42e6e8d326cafc19736d84d",
       "downloads": [
-        "https://github.com/Volodrum/Vasya_Family_Launcher/releases/download/pack-files/6333d492cdce5176a02fb7b63f7570ab4564152a.zip"
+        "https://github.com/Volodrum/Vasya_Family_Launcher/releases/download/pack-files/092b593813ccfae1791044316d8ccddbf9d7851e.zip"
       ],
       "source": {
         "type": "github-release",
-        "asset": "6333d492cdce5176a02fb7b63f7570ab4564152a.zip"
+        "asset": "092b593813ccfae1791044316d8ccddbf9d7851e.zip"
       },
       "enabled": true
     },
