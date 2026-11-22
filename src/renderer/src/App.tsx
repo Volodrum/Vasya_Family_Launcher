@@ -364,9 +364,12 @@ function ModsScreen(props: {
 
   const toggle = (mod: ModEntry, on: boolean): void => {
     const next = { ...s.optionalMods, [mod.id]: on }
-    // Keep dependencies consistent: enabling Iris enables Sodium, disabling Sodium disables Iris.
-    if (on) for (const r of mod.requires) next[r] = true
-    else for (const other of optional) if (other.requires.includes(mod.id)) next[other.id] = false
+    // Keep dependencies consistent: enabling Iris enables Sodium, disabling Sodium disables Iris,
+    // and enabling Sodium again brings back the on-by-default mods that need it (Iris).
+    if (on) {
+      for (const r of mod.requires) next[r] = true
+      for (const other of optional) if (other.default && other.requires.includes(mod.id)) next[other.id] = true
+    } else for (const other of optional) if (other.requires.includes(mod.id)) next[other.id] = false
     void props.onSave({ optionalMods: next })
   }
 

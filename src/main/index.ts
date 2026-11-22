@@ -10,6 +10,7 @@ import { syncPacks } from './packs'
 import { ensureJava, ensureMinecraft, launchGame } from './game'
 import { paths } from './paths'
 import { getSkin } from './skins'
+import { findRunningGame, forgetGame, rememberGame, watchExit } from './running'
 import icon from '../../build/icon.ico?asset'
 
 const { autoUpdater } = electronUpdater
@@ -22,6 +23,8 @@ let manifest: PackManifest | null = null
 let manifestError: string | null = null
 let busy = false
 let gameRunning = false
+/** Startup check for a game left running by an earlier launcher run; Play waits for it. */
+let adopting: Promise<void> = Promise.resolve()
 
 function send(channel: string, payload: unknown): void {
   if (win && !win.isDestroyed()) win.webContents.send(channel, payload)
@@ -58,9 +61,34 @@ async function state(): Promise<LauncherState> {
   }
 }
 
+function gameEnded(): void {
+  gameRunning = false
+  void forgetGame()
+  report('idle', 1)
+  if (win && !win.isDestroyed()) {
+    win.show()
+    win.focus()
+  }
+}
+
+/** A game started by an earlier launcher run is still open: stay locked until it closes. */
+async function adoptRunningGame(): Promise<void> {
+  const pid = await findRunningGame()
+  if (pid === null || gameRunning) return
+  gameRunning = true
+  report('running', 1)
+  send('vf:game', { type: 'started' } satisfies GameEvent)
+  watchExit(pid, () => {
+    if (!gameRunning) return
+    gameEnded()
+    send('vf:game', { type: 'exited' } satisfies GameEvent)
+  })
+}
+
 /** Full pipeline: manifest -> Java -> Minecraft + Fabric -> mods (strict sync) -> launch. */
 async function play(mode: PlayMode | 'repair'): Promise<void> {
   const repair = mode === 'repair'
+  await adopting
   if (busy || gameRunning) return
   busy = true
   try {
@@ -94,7 +122,7 @@ async function play(mode: PlayMode | 'repair'): Promise<void> {
     }
 
     report('launching', -1)
-    await launchGame({
+    const proc = await launchGame({
       manifest: m,
       settings,
       mode,
@@ -107,18 +135,12 @@ async function play(mode: PlayMode | 'repair'): Promise<void> {
           report('running', 1)
         }
         if (e.type === 'window-ready' && settings.closeOnLaunch) win?.hide()
-        if (e.type === 'exited' || e.type === 'error') {
-          gameRunning = false
-          report('idle', 1)
-          if (win && !win.isDestroyed()) {
-            win.show()
-            win.focus()
-          }
-        }
+        if (e.type === 'exited' || e.type === 'error') gameEnded()
         if (process.env.VF_AUTOPLAY) console.log('[game]', JSON.stringify(e).slice(0, 500))
         send('vf:game', e)
       }
     })
+    if (gameRunning && proc.pid) await rememberGame(proc.pid).catch((err) => console.warn('[game] could not save PID:', err))
   } catch (e) {
     progress({ stage: 'error', fraction: 0, detail: (e as Error).message })
     throw e
@@ -128,7 +150,11 @@ async function play(mode: PlayMode | 'repair'): Promise<void> {
 }
 
 function registerIpc(): void {
-  ipcMain.handle('vf:getState', () => state())
+  // Waits for the running-game check so the first screen already shows a game left open.
+  ipcMain.handle('vf:getState', async () => {
+    await adopting
+    return state()
+  })
   ipcMain.handle('vf:getSkin', (_e, nickname: unknown) => (typeof nickname === 'string' ? getSkin(nickname) : null))
   ipcMain.handle('vf:saveSettings', (_e, patch: Partial<Settings>) => saveSettings(patch))
   ipcMain.handle('vf:refreshManifest', async () => {
@@ -279,6 +305,7 @@ if (!app.requestSingleInstanceLock()) {
   app.whenReady().then(async () => {
     app.setAppUserModelId('ua.vasyafamily.launcher')
     registerIpc()
+    adopting = adoptRunningGame().catch((err) => console.warn('[game] running-game check failed:', err))
     await loadManifest()
     createWindow()
     setupUpdater()
