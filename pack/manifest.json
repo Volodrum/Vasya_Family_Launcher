@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "name": "Vasya Family S1",
-  "packVersion": "20261122T082343",
-  "generatedAt": "2026-11-22T08:23:43.796Z",
+  "packVersion": "20261122T084107",
+  "generatedAt": "2026-11-22T08:41:07.790Z",
   "minecraft": "1.20.1",
   "loader": {
     "type": "fabric",
@@ -223,27 +223,6 @@
       }
     },
     {
-      "id": "fabric-language-kotlin",
-      "name": "Fabric Language Kotlin",
-      "version": "1.14.2+kotlin.2.4.21",
-      "file": "fabric-language-kotlin-1.14.2+kotlin.2.4.21.jar",
-      "size": 8142878,
-      "sha1": "f1d4ab6ecd54d9782521333a87eb50724ecb03e0",
-      "sha512": "7fb475c4a7e7bdf8d0aca4b5798a58a354c51443d5b1fbde3e8cf34dfbf7191ef4238b5f07d08ec9490ec180b371624523326c3ad45d4ed2b2be541de9407e5d",
-      "side": "both",
-      "optional": false,
-      "default": true,
-      "requires": [],
-      "downloads": [
-        "https://cdn.modrinth.com/data/Ha28R6CL/versions/SKW1BTL3/fabric-language-kotlin-1.14.2%2Bkotlin.2.4.21.jar"
-      ],
-      "source": {
-        "type": "modrinth",
-        "projectId": "Ha28R6CL",
-        "versionId": "SKW1BTL3"
-      }
-    },
-    {
       "id": "farmersdelight",
       "name": "Farmer's Delight",
       "version": "1.20.1-2.5.7+refabricated",
@@ -387,27 +366,6 @@
       }
     },
     {
-      "id": "inventoryprofilesnext",
-      "name": "Inventory Profiles Next (sorting)",
-      "version": "1.10.20",
-      "file": "InventoryProfilesNext-fabric-1.20-1.10.20.jar",
-      "size": 1455143,
-      "sha1": "e45676c4193d69b0eb0ebdb7881a6daeb36a9b5e",
-      "sha512": "91a031e86f08ca7a018c6c65c1e57aac39d5bf8a14d299d2ed8aab86f8deddbeecd54496fb4d8f3e2e00a30b8058ab9fe70910b448507829005733528c667685",
-      "side": "client",
-      "optional": true,
-      "default": true,
-      "requires": [],
-      "downloads": [
-        "https://cdn.modrinth.com/data/O7RBXm3n/versions/ZTQIr2Z9/InventoryProfilesNext-fabric-1.20-1.10.20.jar"
-      ],
-      "source": {
-        "type": "modrinth",
-        "projectId": "O7RBXm3n",
-        "versionId": "ZTQIr2Z9"
-      }
-    },
-    {
       "id": "iris",
       "name": "Iris",
       "version": "1.7.6+mc1.20.1",
@@ -515,27 +473,6 @@
       }
     },
     {
-      "id": "libipn",
-      "name": "libIPN",
-      "version": "4.0.2",
-      "file": "libIPN-fabric-1.20-4.0.2.jar",
-      "size": 702814,
-      "sha1": "c8c4d93037efb226b6bd3264e33df4c010cb111b",
-      "sha512": "34961bc3a172115b6747248305b484f3cb8d26c4b41994bb8b5759359f817df0c3c73725b8bbaeb15c59c8798a13321ed9875282dbe9a1b81606f381b532a8cd",
-      "side": "client",
-      "optional": false,
-      "default": true,
-      "requires": [],
-      "downloads": [
-        "https://cdn.modrinth.com/data/onSQdWhM/versions/Uygzs3iI/libIPN-fabric-1.20-4.0.2.jar"
-      ],
-      "source": {
-        "type": "modrinth",
-        "projectId": "onSQdWhM",
-        "versionId": "Uygzs3iI"
-      }
-    },
-    {
       "id": "modmenu",
       "name": "Mod Menu",
       "version": "7.2.2",
@@ -554,6 +491,27 @@
         "type": "modrinth",
         "projectId": "mOgUt4GM",
         "versionId": "lEkperf6"
+      }
+    },
+    {
+      "id": "mousewheelie",
+      "name": "Mouse Wheelie (sorting)",
+      "version": "1.16.3+mc1.20.1",
+      "file": "mouse-wheelie-1.16.3+mc1.20.1.jar",
+      "size": 1121853,
+      "sha1": "3eba31ce742c25720cf8d608831c3437443a6e57",
+      "sha512": "77930f0795afc7d21e94c2000c3426a3472bae96c9a1faa0586eedc245ed7b7db250b4032e805afd449fdf5ca589766811d577d54893b26be134b300cc171127",
+      "side": "both",
+      "optional": true,
+      "default": true,
+      "requires": [],
+      "downloads": [
+        "https://cdn.modrinth.com/data/u5Ic2U1u/versions/PzpO9439/mouse-wheelie-1.16.3%2Bmc1.20.1.jar"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "u5Ic2U1u",
+        "versionId": "PzpO9439"
       }
     },
     {

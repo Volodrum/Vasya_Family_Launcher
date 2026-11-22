@@ -40,8 +40,7 @@
     "$comment": "Per-mod settings, keyed by mod id. optional/default/name/extraDownloads override what the tool detects.",
     "sound_physics_remastered": { "optional": true, "default": true },
     "customskinloader-bootstrap": { "name": "CustomSkinLoader (skins)" },
-    "inventoryprofilesnext": { "name": "Inventory Profiles Next (sorting)" },
-    "libipn": { "$comment": "Library for Inventory Profiles Next; always installed so it doesn't show as its own toggle.", "optional": false },
+    "mousewheelie": { "$comment": "Client-side (works without the server); metadata says '*'.", "name": "Mouse Wheelie (sorting)", "optional": true, "default": true },
     "cultivaria": {
       "$comment": "CurseForge file 9544819",
       "downloads": ["https://mediafilez.forgecdn.net/files/9544/819/cultivaria-1.20.1-fabric-3.1.1-1.20.1.jar"]
