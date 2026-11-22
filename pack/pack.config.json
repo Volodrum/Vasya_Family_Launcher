@@ -33,14 +33,15 @@
     ]
   },
   "shaderpacks": {
-    "$comment": "Zips in pack/shaderpacks. 'default' is selected in Iris the first time; 'enabled' decides whether shaders start on.",
-    "default": "superDuperVanilla.zip",
+    "$comment": "Zips in pack/shaderpacks. Optional 'default' is selected in Iris the first time; 'enabled' decides whether shaders start on. No default = Iris installed, no shader picked.",
     "enabled": false
   },
   "overrides": {
     "$comment": "Per-mod settings, keyed by mod id. optional/default/name/extraDownloads override what the tool detects.",
     "sound_physics_remastered": { "optional": true, "default": true },
     "customskinloader-bootstrap": { "name": "CustomSkinLoader (skins)" },
+    "inventoryprofilesnext": { "name": "Inventory Profiles Next (sorting)" },
+    "libipn": { "$comment": "Library for Inventory Profiles Next; always installed so it doesn't show as its own toggle.", "optional": false },
     "cultivaria": {
       "$comment": "CurseForge file 9544819",
       "downloads": ["https://mediafilez.forgecdn.net/files/9544/819/cultivaria-1.20.1-fabric-3.1.1-1.20.1.jar"]
@@ -52,6 +53,10 @@
     "ftbteams": {
       "$comment": "CurseForge file 7499808",
       "downloads": ["https://mediafilez.forgecdn.net/files/7499/808/ftb-teams-fabric-2001.3.2.jar"]
+    },
+    "music_disc_maker": {
+      "$comment": "CurseForge file 9560946 (not on Modrinth). Client & server.",
+      "downloads": ["https://mediafilez.forgecdn.net/files/9560/946/music_disc_maker-3.1.4-fabric-1.20.1.jar"]
     }
   }
 }
