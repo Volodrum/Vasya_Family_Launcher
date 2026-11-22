@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "name": "Vasya Family S1",
-  "packVersion": "20261122T084107",
-  "generatedAt": "2026-11-22T08:41:07.790Z",
+  "packVersion": "20261122T090120",
+  "generatedAt": "2026-11-22T09:01:20.837Z",
   "minecraft": "1.20.1",
   "loader": {
     "type": "fabric",
@@ -96,6 +96,27 @@
         "type": "modrinth",
         "projectId": "lhGA9TYQ",
         "versionId": "WbL7MStR"
+      }
+    },
+    {
+      "id": "balm",
+      "name": "Balm",
+      "version": "7.3.44",
+      "file": "balm-fabric-1.20.1-7.3.44.jar",
+      "size": 576169,
+      "sha1": "a35c3b59dd0fe3251fb2d9d618e85e6aa3787bc5",
+      "sha512": "8c7e8056d470fcfcd37fe5116e643a7eab84c2dd4ebf476e8bd3ca101a6508e6905c1b4eabb2516d0a0e83114ae97930bd9556dd95e752e5ed57eda5b71f962b",
+      "side": "both",
+      "optional": false,
+      "default": true,
+      "requires": [],
+      "downloads": [
+        "https://cdn.modrinth.com/data/MBAkmtvl/versions/R0jLIYXC/balm-fabric-1.20.1-7.3.44.jar"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "MBAkmtvl",
+        "versionId": "R0jLIYXC"
       }
     },
     {
@@ -366,6 +387,27 @@
       }
     },
     {
+      "id": "inventoryessentials",
+      "name": "Inventory Essentials (sorting)",
+      "version": "8.2.19",
+      "file": "inventoryessentials-fabric-1.20.1-8.2.19.jar",
+      "size": 170434,
+      "sha1": "2ef8be71b2f3b586968e418e072168bfa8654dc1",
+      "sha512": "4ed480752fca0fec73e2ee124b95ec255e7fd549a64459e8ac0e45e57706316de8b80857b5beb6375b6e56bce9ec1fe5ad5ed06d17cf1bac719a88a1e06d8001",
+      "side": "both",
+      "optional": true,
+      "default": true,
+      "requires": [],
+      "downloads": [
+        "https://cdn.modrinth.com/data/Boon8xwi/versions/8Ph4OFyN/inventoryessentials-fabric-1.20.1-8.2.19.jar"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "Boon8xwi",
+        "versionId": "8Ph4OFyN"
+      }
+    },
+    {
       "id": "iris",
       "name": "Iris",
       "version": "1.7.6+mc1.20.1",
@@ -494,24 +536,24 @@
       }
     },
     {
-      "id": "mousewheelie",
-      "name": "Mouse Wheelie (sorting)",
-      "version": "1.16.3+mc1.20.1",
-      "file": "mouse-wheelie-1.16.3+mc1.20.1.jar",
-      "size": 1121853,
-      "sha1": "3eba31ce742c25720cf8d608831c3437443a6e57",
-      "sha512": "77930f0795afc7d21e94c2000c3426a3472bae96c9a1faa0586eedc245ed7b7db250b4032e805afd449fdf5ca589766811d577d54893b26be134b300cc171127",
-      "side": "both",
+      "id": "mousetweaks",
+      "name": "Mouse Tweaks",
+      "version": "2.26",
+      "file": "MouseTweaks-fabric-mc1.20-2.26.jar",
+      "size": 77943,
+      "sha1": "6a6b977e671b1ab625e740fc70fb5300c21bb841",
+      "sha512": "d0faf200dda358efddad2d2809f646023f4dd06254572369e07f3bf33cb6941f0fcdb02db4675b30b4f3bd542cbf6196e135680ba91a2b74c2b071f34978e2d5",
+      "side": "client",
       "optional": true,
       "default": true,
       "requires": [],
       "downloads": [
-        "https://cdn.modrinth.com/data/u5Ic2U1u/versions/PzpO9439/mouse-wheelie-1.16.3%2Bmc1.20.1.jar"
+        "https://cdn.modrinth.com/data/aC3cM3Vq/versions/mjuG4AYd/MouseTweaks-fabric-mc1.20-2.26.jar"
       ],
       "source": {
         "type": "modrinth",
-        "projectId": "u5Ic2U1u",
-        "versionId": "PzpO9439"
+        "projectId": "aC3cM3Vq",
+        "versionId": "mjuG4AYd"
       }
     },
     {

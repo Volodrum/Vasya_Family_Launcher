@@ -40,7 +40,8 @@
     "$comment": "Per-mod settings, keyed by mod id. optional/default/name/extraDownloads override what the tool detects.",
     "sound_physics_remastered": { "optional": true, "default": true },
     "customskinloader-bootstrap": { "name": "CustomSkinLoader (skins)" },
-    "mousewheelie": { "$comment": "Client-side (works without the server); metadata says '*'.", "name": "Mouse Wheelie (sorting)", "optional": true, "default": true },
+    "inventoryessentials": { "$comment": "Works without the server; metadata says '*'. Middle-click sort, shift-ctrl move all of a kind.", "name": "Inventory Essentials (sorting)", "optional": true, "default": true },
+    "mousetweaks": { "name": "Mouse Tweaks" },
     "cultivaria": {
       "$comment": "CurseForge file 9544819",
       "downloads": ["https://mediafilez.forgecdn.net/files/9544/819/cultivaria-1.20.1-fabric-3.1.1-1.20.1.jar"]
