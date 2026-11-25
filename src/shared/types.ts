@@ -1,4 +1,5 @@
 /** Types shared by the main process, preload and the UI. */
+import type { ThemeId } from './theme'
 
 export type Language = 'en' | 'uk' | 'ru'
 
@@ -74,6 +75,8 @@ export interface Settings {
   /** Choices for optional mods; missing ids use the mod's default. */
   optionalMods: Record<string, boolean>
   closeOnLaunch: boolean
+  /** Light or dark print (see shared/theme.ts). */
+  theme: ThemeId
 }
 
 export type PlayMode = 'server' | 'local'
@@ -111,6 +114,13 @@ export interface UpdateEvent {
   message?: string
 }
 
+/** Something the player should know about that is not an error. */
+export interface NoticeEvent {
+  type: 'packs-removed'
+  /** Resource/shader packs moved to the game folder's removed-packs (packs are locked to the pack's own). */
+  names: string[]
+}
+
 export interface LauncherState {
   appVersion: string
   settings: Settings
@@ -142,6 +152,7 @@ export interface LauncherApi {
   onProgress(cb: (e: ProgressEvent) => void): () => void
   onGame(cb: (e: GameEvent) => void): () => void
   onUpdate(cb: (e: UpdateEvent) => void): () => void
+  onNotice(cb: (e: NoticeEvent) => void): () => void
 }
 
 export const NICKNAME_RE = /^[A-Za-z0-9_]{3,16}$/

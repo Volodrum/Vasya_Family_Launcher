@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-/** Stone button in the style of the game's menus. `accent` uses the logo's orange. */
+/** Printed button: ink outline on paper. `accent` is filled with the accent ink. */
 export function McButton(props: {
   children: ReactNode
   onClick?: () => void
@@ -37,10 +37,11 @@ export function CycleButton(props: {
   disabled?: boolean
   tip?: string
   wide?: boolean
+  testId?: string
 }): React.JSX.Element {
   return (
-    <McButton onClick={props.onClick} disabled={props.disabled} tip={props.tip} wide={props.wide}>
-      {props.label}: {props.value}
+    <McButton onClick={props.onClick} disabled={props.disabled} tip={props.tip} wide={props.wide} testId={props.testId}>
+      {props.label}: <b className="cycle-value">{props.value}</b>
     </McButton>
   )
 }
@@ -68,9 +69,12 @@ export function McSlider(props: {
         aria-label={props.label}
         onChange={(e) => props.onChange(Number(e.target.value))}
       />
-      <span className="mc-slider-handle" style={{ left: `calc(${f} * (100% - 16px))` }} aria-hidden="true" />
+      <span className="mc-slider-fill" style={{ width: `calc(${f} * (100% - 14px) + 7px)` }} aria-hidden="true" />
+      <span className="mc-slider-handle" style={{ left: `calc(${f} * (100% - 14px))` }} aria-hidden="true" />
       <span className="mc-slider-label" aria-hidden="true">
-        {props.label}: {props.display}
+        <span>
+          {props.label}: {props.display}
+        </span>
       </span>
     </label>
   )

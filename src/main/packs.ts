@@ -1,4 +1,5 @@
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { existsSync } from 'node:fs'
+import { mkdir, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import type { PackFileEntry, PackManifest } from '../shared/types'
 import { downloadMod, isValid } from './mods'
@@ -6,9 +7,10 @@ import { downloadMod, isValid } from './mods'
 /**
  * Resource packs and shader packs that come with the modpack.
  *
- * Unlike mods, these folders are shared with the player: their own packs are never touched.
- * The launcher only adds the pack's files, replaces them when the pack updates, and removes
- * files it installed itself that the pack no longer lists. Pack defaults (which resource
+ * The launcher adds the pack's files, replaces them when the pack updates, and removes files it
+ * installed itself that the pack no longer lists. With policy 'whitelist' (server safety: no x-ray
+ * or fullbright packs) every other pack is moved to <instance>/removed-packs/, never deleted;
+ * with 'any' the player's own packs are left alone. Pack defaults (which resource
  * packs are switched on, which shader is selected) are applied once, the first time a pack
  * appears, so later choices made in the game are respected.
  */
@@ -61,6 +63,28 @@ function setList(lines: string[], key: string, list: string[]): string[] {
   return lines
 }
 
+/** Moves every entry the pack does not list (except `keep`) out of the folder; returns their names. */
+async function moveUnlisted(dir: string, kind: string, wanted: PackFileEntry[], keep: string[], instanceDir: string): Promise<string[]> {
+  const allowed = new Set([...wanted.map((p) => p.file.toLowerCase()), ...keep.map((k) => k.toLowerCase())])
+  const moved: string[] = []
+  for (const name of await readdir(dir).catch(() => [] as string[])) {
+    if (allowed.has(name.toLowerCase())) continue
+    const target = join(instanceDir, 'removed-packs', kind)
+    await mkdir(target, { recursive: true })
+    // Never overwrite an earlier removed pack with the same name.
+    let dest = join(target, name)
+    for (let n = 2; existsSync(dest); n++) dest = join(target, `${n}-${name}`)
+    try {
+      await rename(join(dir, name), dest)
+      moved.push(name)
+    } catch (e) {
+      // Busy (the game has it open) or no access: try again on the next start.
+      console.warn('[packs] could not move', name, (e as Error).message)
+    }
+  }
+  return moved
+}
+
 /** Downloads missing or changed pack files; returns names of packs that failed (not fatal). */
 async function syncFolder(
   dir: string,
@@ -102,8 +126,10 @@ export async function syncPacks(
   manifest: PackManifest,
   instanceDir: string,
   stateFile: string,
-  onProgress: (fraction: number, detail: string) => void
-): Promise<{ failed: string[] }> {
+  onProgress: (fraction: number, detail: string) => void,
+  /** Resource packs the launcher makes itself (the menu pack), allowed even when packs are locked. */
+  keepResourcePacks: string[] = []
+): Promise<{ failed: string[]; removed: string[] }> {
   const rps = manifest.resourcepacks ?? []
   const sps = manifest.shaderpacks ?? []
   const state = await readState(stateFile)
@@ -114,6 +140,10 @@ export async function syncPacks(
   const rp = await syncFolder(join(instanceDir, 'resourcepacks'), rps, state.resourcepacks, step)
   const sp = await syncFolder(join(instanceDir, 'shaderpacks'), sps, state.shaderpacks, step)
 
+  // ---- locked packs: only the pack's own files may stay
+  const removedRp = manifest.policy.resourcepacks === 'whitelist' ? await moveUnlisted(join(instanceDir, 'resourcepacks'), 'resourcepacks', rps, keepResourcePacks, instanceDir) : []
+  const removedSp = manifest.policy.shaderpacks === 'whitelist' ? await moveUnlisted(join(instanceDir, 'shaderpacks'), 'shaderpacks', sps, [], instanceDir) : []
+
   // ---- resource packs: keep options.txt pointing at renamed files, switch on new default packs once
   const optionsFile = join(instanceDir, 'options.txt')
   // A brand-new instance has no options.txt yet; 3465 is the 1.20.1 data version, so Minecraft reads it as current.
@@ -121,6 +151,7 @@ export async function syncPacks(
   const before = lines.join('\n')
   let selected = parseList(lines, 'resourcePacks') ?? ['vanilla']
   let incompatible = parseList(lines, 'incompatibleResourcePacks') ?? []
+  selected = selected.filter((s) => !removedRp.some((r) => s === `file/${r}`))
   for (const [oldFile, newFile] of rp.renamed) {
     selected = selected.map((s) => (s === `file/${oldFile}` ? `file/${newFile}` : s))
     incompatible = incompatible.filter((s) => s !== `file/${oldFile}`)
@@ -141,6 +172,8 @@ export async function syncPacks(
   const irisBefore = iris?.join('\n')
   if (iris) {
     for (const [oldFile, newFile] of sp.renamed) iris = iris.map((l) => (l === `shaderPack=${oldFile}` ? `shaderPack=${newFile}` : l))
+    // A shader that was just moved out can't stay selected.
+    if (removedSp.some((r) => iris!.includes(`shaderPack=${r}`))) iris = iris.filter((l) => !/^(shaderPack|enableShaders)=/.test(l)).concat('enableShaders=false')
   }
   const def = manifest.shaders?.default
   if (!state.shadersIntroduced && def && sp.installed[sps.find((s) => s.file === def)?.id ?? '']) {
@@ -161,5 +194,5 @@ export async function syncPacks(
   await mkdir(dirname(stateFile), { recursive: true })
   await writeFile(stateFile, JSON.stringify(state, null, 2))
   onProgress(1, '')
-  return { failed: [...rp.failed, ...sp.failed] }
+  return { failed: [...rp.failed, ...sp.failed], removed: [...removedRp, ...removedSp] }
 }

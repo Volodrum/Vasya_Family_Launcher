@@ -4,6 +4,7 @@ import { dirname } from 'node:path'
 import { totalmem } from 'node:os'
 import type { Language, Settings } from '../shared/types'
 import { NICKNAME_RE } from '../shared/types'
+import { THEME_IDS } from '../shared/theme'
 import { paths } from './paths'
 
 function defaultLanguage(): Language {
@@ -29,7 +30,8 @@ function defaults(): Settings {
     memoryMb: defaultMemory(),
     serverId: 'main',
     optionalMods: {},
-    closeOnLaunch: true
+    closeOnLaunch: true,
+    theme: 'dark'
   }
 }
 
@@ -54,7 +56,8 @@ function sanitize(s: Settings): Settings {
     memoryMb: Math.min(max, Math.max(2048, Math.round(Number(s.memoryMb) || defaultMemory()))),
     serverId: typeof s.serverId === 'string' ? s.serverId : 'main',
     optionalMods: s.optionalMods && typeof s.optionalMods === 'object' ? s.optionalMods : {},
-    closeOnLaunch: s.closeOnLaunch !== false
+    closeOnLaunch: s.closeOnLaunch !== false,
+    theme: THEME_IDS.includes(s.theme) ? s.theme : 'dark'
   }
 }
 

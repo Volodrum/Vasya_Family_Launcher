@@ -1,6 +1,6 @@
 /**
- * Pixel-art textures drawn at runtime (16x16, upscaled with image-rendering: pixelated).
- * They are original, generated from seeded noise, so the launcher ships no game assets.
+ * Generated pixel faces for players without a skin (8x8, upscaled with image-rendering: pixelated).
+ * Original, drawn from the nickname, so the launcher ships no game assets.
  */
 
 function rng(seed: number): () => number {
@@ -26,52 +26,6 @@ function canvas(size = 16): [HTMLCanvasElement, CanvasRenderingContext2D] {
   const c = document.createElement('canvas')
   c.width = c.height = size
   return [c, c.getContext('2d')!]
-}
-
-/** Speckled block: base colour with random lighter/darker pixels. */
-function speckle(seed: number, base: [number, number, number], spread: number, specks: [number, number, number][] = []): string {
-  const [c, g] = canvas()
-  const r = rng(seed)
-  for (let y = 0; y < 16; y++) {
-    for (let x = 0; x < 16; x++) {
-      let col = shade(base, 1 + (r() - 0.5) * spread)
-      if (specks.length && r() < 0.12) col = specks[Math.floor(r() * specks.length)]
-      g.fillStyle = hex(col)
-      g.fillRect(x, y, 1, 1)
-    }
-  }
-  return c.toDataURL()
-}
-
-/** Planks: four boards with darker seams and a little grain. */
-function planks(seed: number, base: [number, number, number]): string {
-  const [c, g] = canvas()
-  const r = rng(seed)
-  for (let y = 0; y < 16; y++) {
-    const seam = y % 4 === 3
-    for (let x = 0; x < 16; x++) {
-      const board = Math.floor(y / 4)
-      const joint = (x + board * 5) % 16 === 0
-      let k = 1 + (r() - 0.5) * 0.12
-      if (seam) k = 0.62
-      else if (joint) k = 0.72
-      else if (y % 4 === 0) k += 0.06
-      g.fillStyle = hex(shade(base, k))
-      g.fillRect(x, y, 1, 1)
-    }
-  }
-  return c.toDataURL()
-}
-
-export function installTextures(): void {
-  const root = document.documentElement.style
-  const set = (name: string, url: string): void => root.setProperty(name, `url(${url})`)
-  set('--tex-stone', speckle(11, [118, 118, 118], 0.22, [[96, 96, 96], [140, 140, 140]]))
-  set('--tex-stone-dark', speckle(12, [52, 52, 52], 0.2))
-  // Season 1 palette: amethyst for the main button, dark purple stone behind menus.
-  set('--tex-accent', speckle(13, [146, 64, 206], 0.2, [[196, 128, 250], [104, 38, 156], [224, 170, 255]]))
-  set('--tex-menu', speckle(14, [34, 20, 44], 0.3, [[22, 12, 30], [58, 30, 80], [86, 40, 120]]))
-  set('--tex-planks', planks(15, [156, 112, 64]))
 }
 
 function hash(s: string): number {

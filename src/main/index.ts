@@ -2,13 +2,15 @@ import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { join } from 'node:path'
 import { mkdir, writeFile } from 'node:fs/promises'
 import electronUpdater from 'electron-updater'
-import type { GameEvent, LauncherState, PackManifest, PlayMode, ProgressEvent, Settings, Stage, UpdateEvent } from '../shared/types'
+import type { GameEvent, LauncherState, NoticeEvent, PackManifest, PlayMode, ProgressEvent, Settings, Stage, UpdateEvent } from '../shared/types'
 import { loadSettings, saveSettings, totalMemoryMb } from './settings'
 import { fetchManifest, selectMods } from './manifest'
 import { syncMods } from './mods'
 import { syncPacks } from './packs'
+import { MENU_PACK, writeMenu } from './menu'
 import { ensureJava, ensureMinecraft, launchGame } from './game'
 import { paths } from './paths'
+import { THEMES, type ThemeId } from '../shared/theme'
 import { getSkin } from './skins'
 import { findRunningGame, forgetGame, rememberGame, watchExit } from './running'
 import icon from '../../build/icon.ico?asset'
@@ -110,10 +112,18 @@ async function play(mode: PlayMode | 'repair'): Promise<void> {
     await mkdir(join(paths.instance, 'shaderpacks'), { recursive: true })
     // Resource packs and shaders from the pack; a failed download never blocks the game.
     try {
-      const packs = await syncPacks(m, paths.instance, join(paths.state, 'packs.json'), (fraction, detail) => report('packs', fraction, detail))
+      const packs = await syncPacks(m, paths.instance, join(paths.state, 'packs.json'), (fraction, detail) => report('packs', fraction, detail), [MENU_PACK])
       if (packs.failed.length) console.warn('[packs] could not download:', packs.failed.join(', '))
+      if (packs.removed.length) send('vf:notice', { type: 'packs-removed', names: packs.removed } satisfies NoticeEvent)
     } catch (e) {
       console.warn('[packs]', (e as Error).message)
+    }
+    // The in-game main and pause menus (FancyMenu); the game still works with the plain menus if this fails.
+    try {
+      const server = m.servers.find((s) => s.id === settings.serverId) ?? m.servers[0]
+      await writeMenu(paths.instance, { theme: settings.theme, language: settings.language, address: server.address })
+    } catch (e) {
+      console.warn('[menu]', (e as Error).message)
     }
 
     if (mode === 'repair') {
@@ -209,14 +219,15 @@ function setupUpdater(): void {
   setInterval(check, 2 * 60 * 60 * 1000)
 }
 
-function createWindow(): void {
+function createWindow(theme: ThemeId): void {
   win = new BrowserWindow({
     width: 1100,
     height: 680,
     minWidth: 900,
     minHeight: 580,
     frame: false,
-    backgroundColor: '#120818',
+    // Paper colour of the chosen theme, so the window does not flash another colour while it loads.
+    backgroundColor: THEMES[theme].paper,
     show: false,
     title: 'Vasya Family Launcher',
     icon,
@@ -251,6 +262,9 @@ function createWindow(): void {
       const click = (id: string) =>
         w.webContents.executeJavaScript(`(() => { const b = document.querySelector('[data-testid="${id}"]'); b?.click(); return !!b })()`)
       await mkdir(shotsDir, { recursive: true })
+      // A window covered by other windows counts as hidden and stops painting, so captures would be stale.
+      w.setAlwaysOnTop(true)
+      w.focus()
       await wait(1800)
       await shot('1-first')
       if (await click('options')) {
@@ -261,6 +275,18 @@ function createWindow(): void {
         await shot('3-mods')
         await click('done')
         await wait(300)
+        // The title screen in each theme, switched from Options (the loop ends where it started).
+        for (const [button, count] of [['theme', 2]] as const) {
+          for (let i = 1; i <= count; i++) {
+            await click(button)
+            await wait(250)
+            await click('done')
+            await wait(500)
+            await shot(`look-${button}-${i}`)
+            await click('options')
+            await wait(300)
+          }
+        }
         await click('done')
         await wait(400)
         report('mods', 0.42, 'Tech Reborn')
@@ -307,7 +333,7 @@ if (!app.requestSingleInstanceLock()) {
     registerIpc()
     adopting = adoptRunningGame().catch((err) => console.warn('[game] running-game check failed:', err))
     await loadManifest()
-    createWindow()
+    createWindow((await loadSettings()).theme)
     setupUpdater()
   })
   app.on('window-all-closed', () => app.quit())

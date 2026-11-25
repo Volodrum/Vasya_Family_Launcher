@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { GameEvent, Language, LauncherState, ModEntry, PlayMode, ProgressEvent, Settings } from '../../shared/types'
+import type { GameEvent, Language, LauncherState, ModEntry, PlayMode, ProgressEvent, Settings, Stage } from '../../shared/types'
+import type { ThemeId } from '../../shared/theme'
 import { NICKNAME_RE } from '../../shared/types'
 import { LANGUAGES, SPLASHES, stageKey, translate, type Key } from './i18n'
 import { CycleButton, McButton, McCheckbox, McSlider, Toasts, type Toast } from './ui'
 import { headFor } from './textures'
 import { renderBody, renderHead, useRendered, useSkin } from './skin'
-import banner from './assets/season1.webp'
-import logo from './assets/logo.png'
+import { applyTheme, ArtDefs, Scene, VLogo } from './art'
 
 type T = (key: Key, vars?: Record<string, string | number>) => string
 type Screen = 'title' | 'options' | 'mods'
@@ -21,6 +21,8 @@ function nextLanguage(l: Language): Language {
 }
 
 const languageLabel = (l: Language): string => LANGUAGES.find((x) => x.id === l)?.label ?? l
+
+const otherTheme = (th: ThemeId): ThemeId => (th === 'dark' ? 'light' : 'dark')
 
 export function App(): React.JSX.Element {
   const [state, setState] = useState<LauncherState | null>(null)
@@ -65,16 +67,23 @@ export function App(): React.JSX.Element {
         })
       }
     })
+    const offNotice = window.vf.onNotice((e) => {
+      if (e.type === 'packs-removed') pushToast({ kind: 'info', title: tRef.current('toast.packsRemovedTitle'), body: tRef.current('toast.packsRemoved', { n: e.names.length }) })
+    })
     return () => {
       offProgress()
       offGame()
       offUpdate()
+      offNotice()
     }
   }, [pushToast])
 
   useEffect(() => {
     document.documentElement.lang = lang
   }, [lang])
+
+  const theme = state?.settings.theme ?? 'dark'
+  useEffect(() => applyTheme(theme), [theme])
 
   useEffect(() => {
     if (state?.manifestError && !state.manifest) pushToast({ kind: 'error', title: tRef.current('stage.error'), body: tRef.current('manifest.error') })
@@ -85,7 +94,7 @@ export function App(): React.JSX.Element {
     setState((s) => (s ? { ...s, settings } : s))
   }
 
-  if (!state) return <div className="app" />
+  if (!state) return <div className="app"><ArtDefs /></div>
 
   const busy = isBusy(progress)
   const locked = busy || state.gameRunning
@@ -101,8 +110,10 @@ export function App(): React.JSX.Element {
 
   return (
     <div className={`app ${needsNick || screen !== 'title' ? 'menu-bg' : ''}`}>
-      <div className="panorama" style={{ backgroundImage: `url(${banner})` }} aria-hidden="true" />
-      <TitleBar t={t} />
+      <ArtDefs />
+      <Scene />
+      <div className="print-frame" aria-hidden="true" />
+      <TitleBar t={t} theme={theme} onTheme={() => void save({ theme: otherTheme(theme) })} />
       {needsNick ? (
         <NicknameScreen
           t={t}
@@ -142,12 +153,6 @@ export function App(): React.JSX.Element {
           state={state}
           progress={progress}
           onPlay={play}
-          onServer={() => {
-            const servers = state.manifest?.servers ?? []
-            if (!servers.length) return
-            const i = servers.findIndex((s) => s.id === state.settings.serverId)
-            void save({ serverId: servers[(i + 1) % servers.length].id })
-          }}
           onOptions={() => setScreen('options')}
           onChangeNick={() => setEditingNick(true)}
         />
@@ -157,14 +162,28 @@ export function App(): React.JSX.Element {
   )
 }
 
-function TitleBar({ t }: { t: T }): React.JSX.Element {
+function TitleBar({ t, theme, onTheme }: { t: T; theme: ThemeId; onTheme: () => void }): React.JSX.Element {
   return (
     <header className="titlebar">
       <div className="titlebar-brand">
-        <img className="brand-mark" src={logo} alt="" width={22} height={22} />
+        <VLogo size={22} />
         Vasya Family Launcher
       </div>
       <div className="titlebar-controls">
+        <button className="win-btn theme-btn" aria-label={t('theme.toggle')} title={t('theme.toggle')} onClick={onTheme} data-testid="theme-toggle">
+          {theme === 'dark' ? (
+            // Sun: switch to the light print.
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+              <circle cx="8" cy="8" r="3.2" fill="currentColor" />
+              <path d="M8 0.8v2.4M8 12.8v2.4M0.8 8h2.4M12.8 8h2.4M2.9 2.9l1.7 1.7M11.4 11.4l1.7 1.7M2.9 13.1l1.7-1.7M11.4 4.6l1.7-1.7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square" />
+            </svg>
+          ) : (
+            // Moon: switch to the dark print.
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M10.8 1.2A6.8 6.8 0 1 0 14.8 11 5.6 5.6 0 0 1 10.8 1.2Z" fill="currentColor" />
+            </svg>
+          )}
+        </button>
         <button className="win-btn" aria-label={t('minimize')} title={t('minimize')} onClick={() => window.vf.minimize()}>
           <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" shapeRendering="crispEdges">
             <rect x="2" y="6" width="8" height="2" fill="currentColor" />
@@ -192,7 +211,6 @@ function TitleScreen(props: {
   state: LauncherState
   progress: ProgressEvent
   onPlay: (mode: PlayMode) => void
-  onServer: () => void
   onOptions: () => void
   onChangeNick: () => void
 }): React.JSX.Element {
@@ -205,8 +223,6 @@ function TitleScreen(props: {
     const list = SPLASHES[lang]
     return list[Math.floor(Math.random() * list.length)]
   }, [lang])
-  const servers = state.manifest?.servers ?? []
-  const server = servers.find((s) => s.id === state.settings.serverId) ?? servers[0]
   // Real skin face when the nickname has one (Mojang / Ely.by), otherwise a generated face.
   const fallbackHead = useMemo(() => headFor(state.settings.nickname), [state.settings.nickname])
   const skinHead = useRendered(useSkin(state.settings.nickname), renderHead)
@@ -223,7 +239,11 @@ function TitleScreen(props: {
       </div>
 
       <div className="logo-area">
-        <div className="logo" style={{ backgroundImage: `url(${banner})` }} role="img" aria-label="Vasya Family — Season 1" />
+        <h1 className="big-title">
+          <span>Vasya</span>
+          <span>Family</span>
+        </h1>
+        <div className="season-tag">{t('title.season')}</div>
         <span className="splash">{splash}</span>
       </div>
 
@@ -232,24 +252,13 @@ function TitleScreen(props: {
           <LoadingPanel t={t} progress={progress} running={running} />
         ) : (
           <>
-            <McButton accent wide disabled={!state.manifest} onClick={() => props.onPlay('server')} testId="play-server">
-              ▶ {t('title.playServer')}
+            {/* The launcher gets the game ready; the server or a world is chosen in the game's own main menu. */}
+            <McButton accent wide disabled={!state.manifest} onClick={() => props.onPlay('local')} testId="play">
+              ▶ {t('title.play')}
             </McButton>
-            <McButton wide disabled={!state.manifest} onClick={() => props.onPlay('local')} testId="play-local">
-              {t('title.singleplayer')}
+            <McButton wide onClick={props.onOptions} testId="options">
+              {t('title.options')}
             </McButton>
-            <div className="menu-row">
-              <CycleButton
-                label={t('title.server')}
-                value={server ? serverLabel(t, server.id, server.name) : '—'}
-                tip={server ? t('title.serverTip', { a: server.address }) : undefined}
-                onClick={props.onServer}
-                disabled={servers.length < 2}
-              />
-              <McButton onClick={props.onOptions} testId="options">
-                {t('title.options')}
-              </McButton>
-            </div>
           </>
         )}
       </div>
@@ -265,6 +274,16 @@ function TitleScreen(props: {
     </main>
   )
 }
+
+/** Steps shown under the progress bar; each stage belongs to one of them. */
+const STEPS: { label: (t: T) => string; stages: Stage[] }[] = [
+  { label: () => 'Java', stages: ['java'] },
+  { label: () => 'Minecraft', stages: ['minecraft', 'assets'] },
+  { label: () => 'Fabric', stages: ['loader'] },
+  { label: (t) => t('step.mods'), stages: ['mods'] },
+  { label: (t) => t('step.packs'), stages: ['packs'] },
+  { label: (t) => t('step.start'), stages: ['launching'] }
+]
 
 function LoadingPanel({ t, progress, running }: { t: T; progress: ProgressEvent; running: boolean }): React.JSX.Element {
   const key = stageKey(progress.stage)
@@ -285,6 +304,17 @@ function LoadingPanel({ t, progress, running }: { t: T; progress: ProgressEvent;
         <div className="mc-bar-fill" style={{ width: `${running ? 100 : Math.max(0, progress.fraction) * 100}%` }} />
       </div>
       <div className="loading-sub">{sub}</div>
+      <div className="steps" aria-hidden="true">
+        {STEPS.map((s, i) => {
+          const now = STEPS.findIndex((x) => x.stages.includes(progress.stage))
+          const cls = running || (now >= 0 && i < now) ? 'done' : i === now ? 'now' : ''
+          return (
+            <span key={i} className={cls}>
+              {s.label(t)}
+            </span>
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -301,6 +331,8 @@ function OptionsScreen(props: {
   const { t, state } = props
   const s = state.settings
   const maxMb = Math.max(2048, Math.floor((state.totalMemoryMb - 1024) / 512) * 512)
+  const servers = state.manifest?.servers ?? []
+  const server = servers.find((x) => x.id === s.serverId) ?? servers[0]
   useEscape(props.onDone)
 
   return (
@@ -324,13 +356,23 @@ function OptionsScreen(props: {
           tip={t('options.hideTip')}
           onClick={() => void props.onSave({ closeOnLaunch: !s.closeOnLaunch })}
         />
+        <CycleButton label={t('options.theme')} value={t(`theme.${s.theme}`)} testId="theme" onClick={() => void props.onSave({ theme: otherTheme(s.theme) })} />
+        <CycleButton
+          label={t('options.connection')}
+          value={server ? serverLabel(t, server.id, server.name) : '—'}
+          tip={server ? t('options.connectionTip', { a: server.address }) : undefined}
+          disabled={servers.length < 2}
+          testId="connection"
+          onClick={() => {
+            const i = servers.findIndex((x) => x.id === s.serverId)
+            void props.onSave({ serverId: servers[(i + 1) % servers.length].id })
+          }}
+        />
         <McButton onClick={props.onMods} testId="mods">
           {t('options.mods')}
         </McButton>
         <div className="options-gap" />
         <div className="options-gap" />
-        <McButton onClick={() => void window.vf.openFolder('resourcepacks')}>{t('options.resourcepacks')}</McButton>
-        <McButton onClick={() => void window.vf.openFolder('shaderpacks')}>{t('options.shaderpacks')}</McButton>
         <McButton onClick={() => void window.vf.openFolder('screenshots')}>{t('options.screenshots')}</McButton>
         <McButton onClick={() => void window.vf.openFolder('game')}>{t('options.game')}</McButton>
         <McButton onClick={() => void window.vf.openFolder('logs')}>{t('options.logs')}</McButton>
@@ -340,7 +382,7 @@ function OptionsScreen(props: {
       </div>
       <p className="screen-note">{t('options.memoryTip', { total: Math.round(state.totalMemoryMb / 1024) })}</p>
       <div className="screen-bottom">
-        <McButton wide onClick={props.onDone} testId="done">
+        <McButton accent wide onClick={props.onDone} testId="done">
           {t('done')}
         </McButton>
       </div>
@@ -389,7 +431,7 @@ function ModsScreen(props: {
       </div>
       <p className="screen-note">{t('mods.changesNext')}</p>
       <div className="screen-bottom">
-        <McButton wide onClick={props.onDone} testId="done">
+        <McButton accent wide onClick={props.onDone} testId="done">
           {t('done')}
         </McButton>
       </div>
