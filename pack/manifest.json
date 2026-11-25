@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "name": "Vasya Family S1",
-  "packVersion": "20261122T090120",
-  "generatedAt": "2026-11-22T09:01:20.837Z",
+  "packVersion": "20261125T153055",
+  "generatedAt": "2026-11-25T15:30:55.345Z",
   "minecraft": "1.20.1",
   "loader": {
     "type": "fabric",
@@ -117,6 +117,27 @@
         "type": "modrinth",
         "projectId": "MBAkmtvl",
         "versionId": "R0jLIYXC"
+      }
+    },
+    {
+      "id": "bbs",
+      "name": "BBS mod",
+      "version": "2.5-1.20.1",
+      "file": "bbs-2.5-1.20.1.jar",
+      "size": 11065737,
+      "sha1": "caec5b4c1e434ad451e7e9eb492b1669dcd21044",
+      "sha512": "68afda6395eee50de820c0102ef38a1f07968cb643cef21fd715c37f1625d3834114b63fbd85069c7c6ce6bb766738288a1d47098c79ef862b9f3cae374c5716",
+      "side": "both",
+      "optional": false,
+      "default": true,
+      "requires": [],
+      "downloads": [
+        "https://cdn.modrinth.com/data/HNsMvuaQ/versions/c3LSNIIH/bbs-2.5-1.20.1.jar"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "HNsMvuaQ",
+        "versionId": "c3LSNIIH"
       }
     },
     {
