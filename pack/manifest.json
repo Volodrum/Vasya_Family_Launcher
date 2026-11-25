@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "name": "Vasya Family S1",
-  "packVersion": "20261125T155737",
-  "generatedAt": "2026-11-25T15:57:37.741Z",
+  "packVersion": "20261125T182052",
+  "generatedAt": "2026-11-25T18:20:52.744Z",
   "minecraft": "1.20.1",
   "loader": {
     "type": "fabric",
@@ -31,8 +31,8 @@
   ],
   "policy": {
     "mods": "strict",
-    "resourcepacks": "any",
-    "shaderpacks": "any"
+    "resourcepacks": "whitelist",
+    "shaderpacks": "whitelist"
   },
   "mods": [
     {
@@ -265,6 +265,27 @@
       }
     },
     {
+      "id": "fancymenu",
+      "name": "FancyMenu",
+      "version": "3.11.0",
+      "file": "fancymenu_fabric_3.11.0_MC_1.20.1.jar",
+      "size": 38491160,
+      "sha1": "d98ebdf6df341788e9ab435f8d40df76b5dc8bea",
+      "sha512": "b94d76889ef093e963c93b0930d482ca61fdbce04ba60d722bc92c208a291f5cee984f0f7f7e188f8e1fbdcac96cdd93e0c388c9f7ec69c13a2c02995d2e1d4a",
+      "side": "both",
+      "optional": false,
+      "default": true,
+      "requires": [],
+      "downloads": [
+        "https://cdn.modrinth.com/data/Wq5SjeWM/versions/vtgwT2qU/fancymenu_fabric_3.11.0_MC_1.20.1.jar"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "Wq5SjeWM",
+        "versionId": "vtgwT2qU"
+      }
+    },
+    {
       "id": "farmersdelight",
       "name": "Farmer's Delight",
       "version": "1.20.1-2.5.7+refabricated",
@@ -473,6 +494,27 @@
       }
     },
     {
+      "id": "konkrete",
+      "name": "Konkrete",
+      "version": "1.8.1",
+      "file": "konkrete_fabric_1.8.1_MC_1.20.1.jar",
+      "size": 892067,
+      "sha1": "38d3201d95a08bdeb12a8cd3687c6d0b8f5e7f3d",
+      "sha512": "ca65343bd3b063f3e0f68cc1d40da1969cf07ca038670f22a2bac91c2f34162f2c455ceb309680d57da13267ffc99fc7f8d40bb9451e93ff56ab2a688c0e3a45",
+      "side": "both",
+      "optional": false,
+      "default": true,
+      "requires": [],
+      "downloads": [
+        "https://cdn.modrinth.com/data/J81TRJWm/versions/RlBGFlWp/konkrete_fabric_1.8.1_MC_1.20.1.jar"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "J81TRJWm",
+        "versionId": "RlBGFlWp"
+      }
+    },
+    {
       "id": "lambdynlights",
       "name": "LambDynamicLights",
       "version": "4.4.0+1.20.1",
@@ -533,6 +575,27 @@
         "type": "modrinth",
         "projectId": "HJetCzWo",
         "versionId": "sMjnKy5B"
+      }
+    },
+    {
+      "id": "melody",
+      "name": "Melody",
+      "version": "1.0.3",
+      "file": "melody_fabric_1.0.4_MC_1.20.1-1.20.4.jar",
+      "size": 39696,
+      "sha1": "15eeff0c0fd8b4734492915c656077592b2d9e67",
+      "sha512": "3d3379e07eae001860aa71379abe310cda6642965cd55a8d274dacef1b63d8c85fd0663abeec2d247ac1a631bd08b12dace8758f4a035d344e27db5edfe581c5",
+      "side": "both",
+      "optional": false,
+      "default": true,
+      "requires": [],
+      "downloads": [
+        "https://cdn.modrinth.com/data/CVT4pFB2/versions/2o0oW8Yv/melody_fabric_1.0.4_MC_1.20.1-1.20.4.jar"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "CVT4pFB2",
+        "versionId": "2o0oW8Yv"
       }
     },
     {
@@ -615,6 +678,27 @@
       ],
       "source": {
         "type": "url"
+      }
+    },
+    {
+      "id": "nompmenu",
+      "name": "No Multiplayer Menu",
+      "version": "1.1",
+      "file": "NoMPMenu-1.1.jar",
+      "size": 4402,
+      "sha1": "fd5faf7ee67455d82e999c5bb4aae3676a9482db",
+      "sha512": "5d00852df065dfad9fbd0bab123d27215df4c77b156b3452f456129912306d5fe6dd65bde0a3461d5e6f3d486121f826e7b66961a5997311d96ec6f4c7b2f434",
+      "side": "client",
+      "optional": false,
+      "default": true,
+      "requires": [],
+      "downloads": [
+        "https://cdn.modrinth.com/data/chZpRxas/versions/ekXC9gYt/NoMPMenu-1.1.jar"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "chZpRxas",
+        "versionId": "ekXC9gYt"
       }
     },
     {
@@ -955,6 +1039,42 @@
   ],
   "resourcepacks": [
     {
+      "id": "faithful-64x",
+      "name": "Faithful 64x",
+      "version": "9",
+      "file": "Faithful 64x - Beta 9.zip",
+      "size": 9608212,
+      "sha1": "6dd076b2a74b7b9a0141339be48ef9c72c559516",
+      "sha512": "a206b477cea63e23ea074c763c3c3c1c1f3c028abb33940be29b63bbb79583837fe81827a23b156427b44d622c2c6875d7d3cef00fab26aa1b163994ade251d5",
+      "downloads": [
+        "https://cdn.modrinth.com/data/r4GILswZ/versions/YOjutORB/Faithful%2064x%20-%20Beta%209.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "r4GILswZ",
+        "versionId": "YOjutORB"
+      },
+      "enabled": false
+    },
+    {
+      "id": "bare-bones",
+      "name": "Bare Bones",
+      "version": "1.1.7",
+      "file": "Bare Bones 1.20.zip",
+      "size": 7791662,
+      "sha1": "31d55c22f6f26529ff6ba810dba48873862ae358",
+      "sha512": "2a7b9ab20e5a0437ffddf553087fce5f9163032eed7369a566f5876332ec398dc1ab095f360fdf4d7eb27a77b32982335029ac9bb3843785e9e875e6fae15932",
+      "downloads": [
+        "https://cdn.modrinth.com/data/rox3U8B6/versions/s3lwqPHV/Bare%20Bones%201.20.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "rox3U8B6",
+        "versionId": "s3lwqPHV"
+      },
+      "enabled": false
+    },
+    {
       "id": "vanilla-exp",
       "name": "Vanilla Experience+",
       "version": "v2.0",
@@ -1096,9 +1216,97 @@
         "versionId": "yQdcUfnr"
       },
       "enabled": false
+    },
+    {
+      "id": "fast-better-grass",
+      "name": "Fast Better Grass",
+      "version": "26.2",
+      "file": "Fast Better Grass.zip",
+      "size": 10928,
+      "sha1": "3a344f8e36a2e748f11dce1c246b5c6ce91141f1",
+      "sha512": "cc3641e82595f3e72f3075e7c5647fa4d65188c1d9e498be42e8169a03ccd71907fcb625d5ad51a9e8aabcd41e2ab56ec1e4f3be19dfdadff6c06c7736ae915c",
+      "downloads": [
+        "https://cdn.modrinth.com/data/dspVZXKP/versions/U9zNcnWW/Fast%20Better%20Grass.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "dspVZXKP",
+        "versionId": "U9zNcnWW"
+      },
+      "enabled": false
+    },
+    {
+      "id": "glowing-glints",
+      "name": "Enchantment Outlines",
+      "version": "2.0",
+      "file": "Enchantment Outlines.zip",
+      "size": 2033368,
+      "sha1": "8702b133610f4b0eca7a91c45beaae8db48d2a10",
+      "sha512": "9f8983599e7408b137d9610721768c21a97e6848b46841dfc324631b51dd9761a9c5e3102937cf45a184c05d64a9a136f1d3f949d4a3565965acae1e4bafff50",
+      "downloads": [
+        "https://cdn.modrinth.com/data/A32gwfe8/versions/RZESSQH8/Enchantment%20Outlines.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "A32gwfe8",
+        "versionId": "RZESSQH8"
+      },
+      "enabled": false
+    },
+    {
+      "id": "translations-for-sodium",
+      "name": "Translations for Sodium",
+      "version": "v9.0.0",
+      "file": "SodiumTranslations.zip",
+      "size": 289781,
+      "sha1": "c973cee802af897ea24706791903ef57ca7759be",
+      "sha512": "7581176dbee2906c6a2156bb90c94e0b329121a8324159a32d44a95eca4ca3cced0c64c40b1ef82ce10966814bec3cbc9d6cfbecc539e3e9976b17fd73218699",
+      "downloads": [
+        "https://cdn.modrinth.com/data/yfDziwn1/versions/icQ18kbk/SodiumTranslations.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "yfDziwn1",
+        "versionId": "icQ18kbk"
+      },
+      "enabled": true
     }
   ],
   "shaderpacks": [
+    {
+      "id": "bsl-shaders",
+      "name": "BSL Shaders",
+      "version": "10.1.8",
+      "file": "BSL_v10.1.8.zip",
+      "size": 1134153,
+      "sha1": "e89818c8827d0131c102fb480c3c3446624db0df",
+      "sha512": "94a3c25d6820868db624e11347873e6b572e7cd571967d9ac6f4690ca5d37ca302a7645d85eec800e0654541e3825fba14d37b5a25d3996aaf038178552be26f",
+      "downloads": [
+        "https://cdn.modrinth.com/data/Q1vvjJYV/versions/Y68yiql9/BSL_v10.1.8.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "Q1vvjJYV",
+        "versionId": "Y68yiql9"
+      }
+    },
+    {
+      "id": "bliss-shader",
+      "name": "Bliss Shaders",
+      "version": "2.1.2",
+      "file": "Bliss_v2.1.2_(Chocapic13_Shaders_edit).zip",
+      "size": 1791406,
+      "sha1": "ded6c8a98305f8aff90ef781e7585b33b8452cfd",
+      "sha512": "dafc60be4980ec40f40edc0f2625cb0976f3c9ce5ed86383146a120480826bb1de70ef5e38b7f1437294ed4d38c6ef3c82ebef0ae4e00b8cee165788c9c18280",
+      "downloads": [
+        "https://cdn.modrinth.com/data/ZvMtQlho/versions/kC2Y8q1P/Bliss_v2.1.2_%28Chocapic13_Shaders_edit%29.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "ZvMtQlho",
+        "versionId": "kC2Y8q1P"
+      }
+    },
     {
       "id": "complementary-reimagined",
       "name": "Complementary Shaders - Reimagined",
@@ -1114,6 +1322,23 @@
         "type": "modrinth",
         "projectId": "HVnmMxH1",
         "versionId": "RKfUB9VC"
+      }
+    },
+    {
+      "id": "complementary-unbound",
+      "name": "Complementary Shaders - Unbound",
+      "version": "r5.10",
+      "file": "ComplementaryUnbound_r5.10.zip",
+      "size": 567391,
+      "sha1": "7a9a6b667b89d6b442837c5c367cd6cc8356b400",
+      "sha512": "bccfca6b07ea4c75b3d7c8bfb875de54ecb3ce4416c960194974d887b65c2aebc9ebd2f6911356bdcb2b0f8740ce70adbf2fdf2e39698616c194104400f70e62",
+      "downloads": [
+        "https://cdn.modrinth.com/data/R6NEzAwj/versions/QJiYQisE/ComplementaryUnbound_r5.10.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "R6NEzAwj",
+        "versionId": "QJiYQisE"
       }
     },
     {
@@ -1148,6 +1373,23 @@
         "type": "modrinth",
         "projectId": "xEItlMn3",
         "versionId": "fzxeGgx7"
+      }
+    },
+    {
+      "id": "solas-shader",
+      "name": "Solas Shader",
+      "version": "3.9",
+      "file": "Solas Shader V3.9.zip",
+      "size": 1243081,
+      "sha1": "7130b2ef691aa90f117231ba9ab01e7f6fca6fab",
+      "sha512": "754f88b030fc26a6284bc7fdede886af494b227a67e716ce89c8ec5a185f8ad33d0aeac573245c5e39621ac5b24b4778d50ce566647135c2f1b2f63643901c69",
+      "downloads": [
+        "https://cdn.modrinth.com/data/EpQFjzrQ/versions/IsqhVpb8/Solas%20Shader%20V3.9.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "EpQFjzrQ",
+        "versionId": "IsqhVpb8"
       }
     },
     {
@@ -1199,6 +1441,23 @@
         "type": "modrinth",
         "projectId": "UaS8ROxa",
         "versionId": "LWmZ94RG"
+      }
+    },
+    {
+      "id": "photon-shader",
+      "name": "Photon Shaders",
+      "version": "v1.4",
+      "file": "photon_v1.4.zip",
+      "size": 3857333,
+      "sha1": "96c7730f5891a42e39bbf1f0f5a98fa99628a7fe",
+      "sha512": "2dec87084dccf91a72a06235ecbfb3627f066699b5f70583f06077cba61433aedbfa6af28eb68bf1cdc726149cc3d9a587517cfab59e6a24e9d6a40b6874d655",
+      "downloads": [
+        "https://cdn.modrinth.com/data/lLqFfGNs/versions/BnGklH5y/photon_v1.4.zip"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "lLqFfGNs",
+        "versionId": "BnGklH5y"
       }
     },
     {

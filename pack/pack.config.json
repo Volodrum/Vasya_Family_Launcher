@@ -2,12 +2,30 @@
   "$comment": "Input for tools/build-manifest.mjs. Edit this, drop jars into pack/mods, run `npm run pack:build`, commit pack/manifest.json.",
   "name": "Vasya Family S1",
   "minecraft": "1.20.1",
-  "loader": { "type": "fabric", "version": "0.20.1" },
-  "java": { "component": "java-runtime-gamma", "major": 17 },
+  "loader": {
+    "type": "fabric",
+    "version": "0.20.1"
+  },
+  "java": {
+    "component": "java-runtime-gamma",
+    "major": 17
+  },
   "servers": [
-    { "id": "main", "name": "Vasya Family", "address": "vasyafamily.sahur.win" },
-    { "id": "anycast", "name": "Anycast proxy", "address": "lefinlomeanmor.peniscraft.pro" },
-    { "id": "direct", "name": "Direct IP", "address": "95.216.92.67:25970" }
+    {
+      "id": "main",
+      "name": "Vasya Family",
+      "address": "vasyafamily.sahur.win"
+    },
+    {
+      "id": "anycast",
+      "name": "Anycast proxy",
+      "address": "lefinlomeanmor.peniscraft.pro"
+    },
+    {
+      "id": "direct",
+      "name": "Direct IP",
+      "address": "95.216.92.67:25970"
+    }
   ],
   "selfHost": {
     "$comment": "Mods that are not found on Modrinth are uploaded to this GitHub release (named by SHA-1) and downloaded from here.",
@@ -16,47 +34,122 @@
   },
   "policy": {
     "mods": "strict",
-    "resourcepacks": "any",
-    "shaderpacks": "any"
+    "resourcepacks": "whitelist",
+    "shaderpacks": "whitelist"
   },
   "resourcepacks": {
-    "$comment": "Zips in pack/resourcepacks, listed bottom to top (last = highest priority). 'enabled' packs are switched on the first time a player gets them; afterwards the player's own choice wins. Players can still add their own packs.",
+    "$comment": "Zips in pack/resourcepacks, listed bottom to top (last = highest priority). 'enabled' packs are switched on the first time a player gets them; afterwards the player's own choice wins. Policy 'whitelist': only these packs are allowed, the launcher moves any other pack out of the game folder.",
     "order": [
-      { "file": "Vanilla Experience+ v2.0.zip", "enabled": true },
-      { "file": "Simple Grass Flowers v2.0.0.zip", "enabled": true },
-      { "file": "Better-Leaves-9.6.zip", "enabled": true },
-      { "file": "Fancy Crops v1.3.zip", "enabled": true },
-      { "file": "TechReborn-Vanilla-Machines-1.6.zip", "enabled": true, "id": "techreborn-vanilla-machines", "name": "Tech Reborn: Vanilla Machines", "version": "1.6" },
-      { "file": "Fluid & Foolish 1.0.1.zip", "enabled": true },
-      { "file": "Default-Dark-Mode-1.20-2023.7.0.zip", "enabled": false },
-      { "file": "LowOnFire v26.2.zip", "enabled": false }
+      {
+        "file": "Faithful 64x - Beta 9.zip",
+        "enabled": false
+      },
+      {
+        "file": "Bare Bones 1.20.zip",
+        "enabled": false
+      },
+      {
+        "file": "Vanilla Experience+ v2.0.zip",
+        "enabled": true
+      },
+      {
+        "file": "Simple Grass Flowers v2.0.0.zip",
+        "enabled": true
+      },
+      {
+        "file": "Better-Leaves-9.6.zip",
+        "enabled": true
+      },
+      {
+        "file": "Fancy Crops v1.3.zip",
+        "enabled": true
+      },
+      {
+        "file": "TechReborn-Vanilla-Machines-1.6.zip",
+        "enabled": true,
+        "id": "techreborn-vanilla-machines",
+        "name": "Tech Reborn: Vanilla Machines",
+        "version": "1.6"
+      },
+      {
+        "file": "Fluid & Foolish 1.0.1.zip",
+        "enabled": true
+      },
+      {
+        "file": "Default-Dark-Mode-1.20-2023.7.0.zip",
+        "enabled": false
+      },
+      {
+        "file": "LowOnFire v26.2.zip",
+        "enabled": false
+      },
+      {
+        "file": "Fast Better Grass.zip",
+        "enabled": false
+      },
+      {
+        "file": "Enchantment Outlines.zip",
+        "enabled": false
+      },
+      {
+        "file": "SodiumTranslations.zip",
+        "enabled": true
+      }
     ]
   },
   "shaderpacks": {
-    "$comment": "Zips in pack/shaderpacks. Optional 'default' is selected in Iris the first time; 'enabled' decides whether shaders start on. No default = Iris installed, no shader picked.",
+    "$comment": "Zips in pack/shaderpacks. Optional 'default' is selected in Iris the first time; 'enabled' decides whether shaders start on. No default = Iris installed, no shader picked. Policy 'whitelist': only these shaders are allowed.",
     "enabled": false
   },
   "overrides": {
     "$comment": "Per-mod settings, keyed by mod id. optional/default/name/extraDownloads override what the tool detects.",
-    "sound_physics_remastered": { "optional": true, "default": true },
-    "customskinloader-bootstrap": { "name": "CustomSkinLoader (skins)" },
-    "inventoryessentials": { "$comment": "Works without the server; metadata says '*'. Middle-click sort, shift-ctrl move all of a kind.", "name": "Inventory Essentials (sorting)", "optional": true, "default": true },
-    "mousetweaks": { "name": "Mouse Tweaks" },
+    "sound_physics_remastered": {
+      "optional": true,
+      "default": true
+    },
+    "customskinloader-bootstrap": {
+      "name": "CustomSkinLoader (skins)"
+    },
+    "inventoryessentials": {
+      "$comment": "Works without the server; metadata says '*'. Middle-click sort, shift-ctrl move all of a kind.",
+      "name": "Inventory Essentials (sorting)",
+      "optional": true,
+      "default": true
+    },
+    "mousetweaks": {
+      "name": "Mouse Tweaks"
+    },
     "cultivaria": {
       "$comment": "CurseForge file 9544819",
-      "downloads": ["https://mediafilez.forgecdn.net/files/9544/819/cultivaria-1.20.1-fabric-3.1.1-1.20.1.jar"]
+      "downloads": [
+        "https://mediafilez.forgecdn.net/files/9544/819/cultivaria-1.20.1-fabric-3.1.1-1.20.1.jar"
+      ]
     },
     "ftblibrary": {
       "$comment": "CurseForge file 8226926",
-      "downloads": ["https://mediafilez.forgecdn.net/files/8226/926/ftb-library-fabric-2001.2.13.jar"]
+      "downloads": [
+        "https://mediafilez.forgecdn.net/files/8226/926/ftb-library-fabric-2001.2.13.jar"
+      ]
     },
     "ftbteams": {
       "$comment": "CurseForge file 7499808",
-      "downloads": ["https://mediafilez.forgecdn.net/files/7499/808/ftb-teams-fabric-2001.3.2.jar"]
+      "downloads": [
+        "https://mediafilez.forgecdn.net/files/7499/808/ftb-teams-fabric-2001.3.2.jar"
+      ]
     },
     "music_disc_maker": {
       "$comment": "CurseForge file 8977189 (not on Modrinth). Client & server. Must match the server's network protocol (3.0.x = 13, 3.1.0 = 22, 3.1.4 = 25): the server runs 3.0.x, so the pack stays on 3.0.5 until the server is updated.",
-      "downloads": ["https://mediafilez.forgecdn.net/files/8977/189/music_disc_maker-3.0.5%2Bfabric-1.20.1.jar"]
+      "downloads": [
+        "https://mediafilez.forgecdn.net/files/8977/189/music_disc_maker-3.0.5%2Bfabric-1.20.1.jar"
+      ]
+    },
+    "nompmenu": {
+      "$comment": "Sends the server list (e.g. after leaving the server) back to the main menu. Part of the menu design, so not optional.",
+      "name": "No Multiplayer Menu",
+      "optional": false
+    },
+    "fancymenu": {
+      "$comment": "Main and pause menu design (layouts are written by the launcher, src/main/menu.ts)."
     }
   }
 }
