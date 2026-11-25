@@ -8,6 +8,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -42,6 +43,11 @@ public final class GuardServer implements DedicatedServerModInitializer {
     private volatile GuardConfig config;
     private ScheduledExecutorService scheduler;
     private volatile long lastRefresh;
+    /** A forced re-read of the manifest (see {@link #refreshNow}). */
+    private static final long FORCED_REFRESH_GAP_MS = 15_000;
+    private final Object forcedLock = new Object();
+    private CompletableFuture<Void> forcedRefresh;
+    private long lastForced;
     /** Players whose answer we are waiting for. */
     private final Map<ServerLoginNetworkHandler, Pending> pending = new ConcurrentHashMap<>();
 
@@ -90,18 +96,42 @@ public final class GuardServer implements DedicatedServerModInitializer {
             Pending p = pending.remove(handler);
             if (p == null) return;
             Verdict v;
+            List<String> mods = new ArrayList<>();
             try {
-                v = understood ? verify(p.config, p.name, p.nonce, buf)
+                v = understood ? verifyToken(p.config, p.name, p.nonce, buf, mods)
                         : Verdict.reject(Messages.Kind.USE_LAUNCHER, "no Vasya Family Guard mod (vanilla or another launcher)");
             } catch (RuntimeException e) {
                 v = Verdict.reject(Messages.Kind.USE_LAUNCHER, "malformed answer: " + e);
             }
-            if (v.kind == null) {
-                LOG.info("{} passed the launcher check ({})", p.name, v.detail);
-            } else {
-                LOG.warn("Kicked {}: {}", p.name, v.detail);
-                handler.disconnect(Messages.kick(v.kind, p.config.launcherUrl));
+            if (v == null) {
+                v = checkPack(p.config, mods);
+                // A pack update may be newer than the server's copy of the manifest (it is re-read every
+                // few minutes). Re-read it before kicking; the login waits for that instead of a network thread.
+                CompletableFuture<Void> reread = null;
+                if (v.kind == Messages.Kind.WRONG_MODS && scheduler != null) {
+                    try {
+                        reread = refreshNow(p.config);
+                    } catch (RuntimeException e) {
+                        LOG.warn("Could not start a pack manifest re-read: {}", e.toString());
+                    }
+                }
+                if (reread != null) {
+                    LOG.info("{}: {}; checking against a fresh pack manifest before deciding", p.name, v.detail);
+                    List<String> answered = mods;
+                    sync.waitFor(reread.handle((ignored, err) -> {
+                        Verdict again;
+                        try {
+                            again = checkPack(p.config, answered);
+                        } catch (RuntimeException e) {
+                            again = Verdict.reject(Messages.Kind.WRONG_MODS, "pack re-check failed: " + e);
+                        }
+                        finish(handler, p, again);
+                        return null;
+                    }));
+                    return;
+                }
             }
+            finish(handler, p, v);
         });
         ServerLoginConnectionEvents.DISCONNECT.register((handler, server) -> pending.remove(handler));
 
@@ -145,6 +175,38 @@ public final class GuardServer implements DedicatedServerModInitializer {
         }
     }
 
+    private static void finish(ServerLoginNetworkHandler handler, Pending p, Verdict v) {
+        if (v.kind == null) {
+            LOG.info("{} passed the launcher check ({})", p.name, v.detail);
+        } else {
+            LOG.warn("Kicked {}: {}", p.name, v.detail);
+            handler.disconnect(Messages.kick(v.kind, p.config.launcherUrl));
+        }
+    }
+
+    /**
+     * Re-reads the pack manifest now. Players who join while a read is running wait for that same read.
+     * Returns null when the last read finished less than {@link #FORCED_REFRESH_GAP_MS} ago (the answer
+     * would be the same), so wrong-mod joins can't make the server hammer GitHub.
+     */
+    private CompletableFuture<Void> refreshNow(GuardConfig cfg) {
+        synchronized (forcedLock) {
+            long now = System.currentTimeMillis();
+            if (forcedRefresh != null && !forcedRefresh.isDone()) return forcedRefresh;
+            if (forcedRefresh != null && now - lastForced < FORCED_REFRESH_GAP_MS) return null;
+            lastForced = now;
+            lastRefresh = now;
+            forcedRefresh = CompletableFuture.runAsync(() -> {
+                try {
+                    pack.refresh(cfg);
+                } catch (RuntimeException e) {
+                    LOG.warn("Pack manifest refresh failed: {}", e.toString());
+                }
+            }, scheduler);
+            return forcedRefresh;
+        }
+    }
+
     private void status(ServerCommandSource src) {
         GuardConfig cfg = config;
         PackAllowlist.Snapshot s = pack.current();
@@ -170,7 +232,11 @@ public final class GuardServer implements DedicatedServerModInitializer {
         }
     }
 
-    private Verdict verify(GuardConfig cfg, String name, byte[] nonce, PacketByteBuf buf) {
+    /**
+     * Checks the launcher token. Returns a reject, or {@code null} when the token verifies; then {@code mods}
+     * holds the signed mod jars (SHA-1s) for {@link #checkPack}.
+     */
+    private Verdict verifyToken(GuardConfig cfg, String name, byte[] nonce, PacketByteBuf buf, List<String> mods) {
         int protocol = buf.readVarInt();
         if (protocol != GuardProtocol.PROTOCOL) {
             return Verdict.reject(Messages.Kind.USE_LAUNCHER, "guard protocol " + protocol + ", server expects " + GuardProtocol.PROTOCOL);
@@ -187,7 +253,6 @@ public final class GuardServer implements DedicatedServerModInitializer {
         }
         int count = buf.readVarInt();
         if (count < 0 || count > GuardProtocol.MAX_MODS) return Verdict.reject(Messages.Kind.WRONG_MODS, "mod count " + count);
-        List<String> mods = new ArrayList<>(count);
         for (int i = 0; i < count; i++) mods.add(buf.readString(128).toLowerCase());
 
         if (!hasToken) return Verdict.reject(Messages.Kind.USE_LAUNCHER, "has the guard mod " + modVersion + " but no launcher token (game not started by the launcher)");
@@ -206,7 +271,11 @@ public final class GuardServer implements DedicatedServerModInitializer {
         if (!GuardProtocol.modsHash(mods).equals(signedHash)) {
             return Verdict.reject(Messages.Kind.WRONG_MODS, "loaded mods differ from what the launcher installed (" + mods.size() + " jars)");
         }
+        return null;
+    }
 
+    /** Compares the signed mod jars with the current pack manifest. */
+    private Verdict checkPack(GuardConfig cfg, List<String> mods) {
         if (!cfg.checkMods) return Verdict.ok("token ok, mod check off");
         PackAllowlist.Snapshot pack = this.pack.current();
         if (pack == null) return Verdict.ok("token ok, pack manifest not loaded so mods not checked");
