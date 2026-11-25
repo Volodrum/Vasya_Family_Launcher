@@ -1,102 +1,85 @@
-// Draws the launcher logo ("double-rim V": amethyst V, dark gap, gold outer rim) as 16x16 pixel art
-// and writes build/icon.png (512), build/icon.ico (16-256) and src/renderer/src/assets/logo.png (16).
-// node tools/make-icon.mjs
+// Draws the launcher icon: the "double-rim V" re-cut as a linocut (accent rim, paper gap, ink V with
+// carved lines), the same drawing as the title-bar logo (symbol #vf-v in src/renderer/src/art.tsx),
+// in the dark theme's colours. Writes build/icon.png (512) and build/icon.ico (16-256), which
+// electron-builder puts into the exe, installer and shortcuts, and the main process uses for the window.
+//   npx electron tools/make-icon.mjs            (add --preview for build/icon-preview.png, all sizes side by side)
+import { app, BrowserWindow } from 'electron'
 import fs from 'node:fs'
 import path from 'node:path'
-import zlib from 'node:zlib'
 import { fileURLToPath } from 'node:url'
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
-const C = {
-  K: [0x12, 0x08, 0x18], // night (background)
-  L: [0xdc, 0xaa, 0xff], // amethyst highlight
-  A: [0xb8, 0x4d, 0xff], // amethyst
-  P: [0x7a, 0x2f, 0xc0], // amethyst shadow
-  Y: [0xf2, 0xc1, 0x4e], // gold
-  y: [0xb8, 0x86, 0x2a] // gold shadow
-}
-const V = [
-  'XXX......XXX',
-  'XXX......XXX',
-  '.XXX....XXX.',
-  '.XXX....XXX.',
-  '..XXX..XXX..',
-  '..XXX..XXX..',
-  '...XXXXXX...',
-  '...XXXXXX...',
-  '....XXXX....',
-  '....XXXX....',
-  '.....XX.....'
-]
+// Dark theme (src/shared/theme.ts): cream ink, near-black paper, vermilion accent.
+const C = { paper: '#1b1916', ink: '#ece2cc', acc: '#e0533a' }
+// Same paths as the #vf-v symbol, on a 100x100 grid.
+const RIM = 'M4 10 L36 10 L50 46 L64 10 L96 10 L62 94 L38 94 Z'
+const GAP = 'M14 17 L32 17 L50 62 L68 17 L86 17 L58 87 L42 87 Z'
+const V = 'M21 22 L31 22 L50 70 L69 22 L79 22 L55 82 L45 82 Z'
+const CARVE = 'M28 28 L44 68 M33 26 L47 62 M72 28 L56 68'
 
-const N = 16
-const grid = Array.from({ length: N }, () => Array(N).fill('K'))
-const key = (x, y) => `${x},${y}`
-const set = (l) => new Set(l.map(([x, y]) => key(x, y)))
-const dilate = (l) => {
-  const m = new Map()
-  for (const [x, y] of l) for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) m.set(key(x + i, y + j), [x + i, y + j])
-  return [...m.values()]
-}
-const paint = (l, c) => l.forEach(([x, y]) => { if (x >= 0 && x < N && y >= 0 && y < N) grid[y][x] = c })
+// Windows picks the nearest size, so the in-between ones keep it sharp at 125/150% scaling.
+const SIZES = [16, 20, 24, 32, 40, 48, 64, 96, 128, 256]
 
-const v = V.flatMap((r, j) => [...r].flatMap((ch, i) => (ch === 'X' ? [[2 + i, 2 + j]] : [])))
-const gap = dilate(v)
-const gapSet = set(gap)
-const rim = dilate(gap).filter(([x, y]) => !gapSet.has(key(x, y)))
-paint(rim, 'Y')
-paint(rim.filter(([, y]) => y === 14), 'y')
-const vs = set(v)
-const has = (x, y) => vs.has(key(x, y))
-for (const [x, y] of v) grid[y][x] = !has(x - 1, y) || !has(x, y - 1) ? 'L' : !has(x + 1, y) || !has(x, y + 1) ? 'P' : 'A'
+const page = `<!doctype html><script>
+window.draw = (size, c, paths) => {
+  const cv = document.createElement('canvas'); cv.width = cv.height = size
+  const g = cv.getContext('2d')
+  g.scale(size / 100, size / 100)
+  // Small icons: fill the square a little more so the V reads on the taskbar.
+  if (size <= 24) { g.translate(50, 52); g.scale(1.08, 1.08); g.translate(-50, -52) }
+  g.fillStyle = c.acc; g.fill(new Path2D(paths.rim))
+  g.fillStyle = c.paper; g.fill(new Path2D(paths.gap))
+  g.fillStyle = c.ink; g.fill(new Path2D(paths.v))
+  // The carved lines only where they are more than a hair thick.
+  if (size >= 48) { g.strokeStyle = c.paper; g.lineWidth = 2.5; g.lineCap = 'butt'; g.stroke(new Path2D(paths.carve)) }
+  return cv.toDataURL('image/png').split(',')[1]
+}
+window.ready = true
+</script>`
 
-// Transparent outside the rim's footprint so the icon isn't a dark square on light taskbars.
-const inside = set(dilate(gap))
-function rgba(size) {
-  const s = size / N
-  const buf = Buffer.alloc(size * size * 4)
-  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
-    const gx = Math.floor(x / s), gy = Math.floor(y / s)
-    const o = (y * size + x) * 4
-    if (!inside.has(key(gx, gy))) continue
-    buf.set([...C[grid[gy][gx]], 255], o)
-  }
-  return buf
-}
-
-const crcTable = Array.from({ length: 256 }, (_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; return c >>> 0 })
-const crc = (b) => { let c = 0xffffffff; for (const x of b) c = crcTable[(c ^ x) & 0xff] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0 }
-function chunk(type, data) {
-  const len = Buffer.alloc(4); len.writeUInt32BE(data.length)
-  const td = Buffer.concat([Buffer.from(type), data])
-  const c = Buffer.alloc(4); c.writeUInt32BE(crc(td))
-  return Buffer.concat([len, td, c])
-}
-function png(size) {
-  const px = rgba(size)
-  const raw = Buffer.alloc(size * (size * 4 + 1))
-  for (let y = 0; y < size; y++) px.copy(raw, y * (size * 4 + 1) + 1, y * size * 4, (y + 1) * size * 4)
-  const ihdr = Buffer.alloc(13)
-  ihdr.writeUInt32BE(size, 0); ihdr.writeUInt32BE(size, 4); ihdr[8] = 8; ihdr[9] = 6
-  return Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), chunk('IHDR', ihdr), chunk('IDAT', zlib.deflateSync(raw, { level: 9 })), chunk('IEND', Buffer.alloc(0))])
-}
-function ico(sizes) {
-  const imgs = sizes.map(png)
-  const head = Buffer.alloc(6 + 16 * sizes.length)
-  head.writeUInt16LE(1, 2); head.writeUInt16LE(sizes.length, 4)
+function ico(pngs) {
+  const head = Buffer.alloc(6 + 16 * pngs.length)
+  head.writeUInt16LE(1, 2)
+  head.writeUInt16LE(pngs.length, 4)
   let off = head.length
-  sizes.forEach((s, i) => {
+  pngs.forEach(([size, img], i) => {
     const e = 6 + 16 * i
-    head[e] = s >= 256 ? 0 : s; head[e + 1] = s >= 256 ? 0 : s
-    head.writeUInt16LE(1, e + 4); head.writeUInt16LE(32, e + 6)
-    head.writeUInt32LE(imgs[i].length, e + 8); head.writeUInt32LE(off, e + 12)
-    off += imgs[i].length
+    head[e] = size >= 256 ? 0 : size
+    head[e + 1] = size >= 256 ? 0 : size
+    head.writeUInt16LE(1, e + 4)
+    head.writeUInt16LE(32, e + 6)
+    head.writeUInt32LE(img.length, e + 8)
+    head.writeUInt32LE(off, e + 12)
+    off += img.length
   })
-  return Buffer.concat([head, ...imgs])
+  return Buffer.concat([head, ...pngs.map(([, img]) => img)])
 }
 
-const out = (rel, data) => { const p = path.join(root, rel); fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, data); console.log(rel, data.length, 'bytes') }
-out('build/icon.png', png(512))
-out('build/icon.ico', ico([16, 20, 24, 32, 40, 48, 64, 96, 128, 256])) // in-between sizes so Windows doesn't blur-scale at 125/150% DPI
-out('src/renderer/src/assets/logo.png', png(16))
-if (process.argv.includes('--preview')) out('build/icon-preview-64.png', png(64))
+const out = (rel, data) => {
+  const p = path.join(root, rel)
+  fs.mkdirSync(path.dirname(p), { recursive: true })
+  fs.writeFileSync(p, data)
+  console.log(rel, data.length, 'bytes')
+}
+
+app.whenReady().then(async () => {
+  const win = new BrowserWindow({ show: false, webPreferences: { offscreen: true } })
+  await win.loadURL('data:text/html;base64,' + Buffer.from(page).toString('base64'))
+  const paths = JSON.stringify({ rim: RIM, gap: GAP, v: V, carve: CARVE })
+  const draw = async (size) => Buffer.from(await win.webContents.executeJavaScript(`draw(${size}, ${JSON.stringify(C)}, ${paths})`), 'base64')
+  const pngs = []
+  for (const s of SIZES) pngs.push([s, await draw(s)])
+  out('build/icon.png', await draw(512))
+  out('build/icon.ico', ico(pngs))
+  if (process.argv.includes('--preview')) {
+    // All sizes side by side on light and dark backgrounds, to check them by eye.
+    const html = `<body style="margin:0;display:grid;grid-template-rows:1fr 1fr;width:900px;height:640px">${['#f3f3f3', '#202020']
+      .map((bg) => `<div style="background:${bg};display:flex;align-items:center;gap:18px;padding:0 18px">${pngs.map(([s, img]) => `<img width="${s}" height="${s}" src="data:image/png;base64,${img.toString('base64')}">`).join('')}</div>`)
+      .join('')}</body>`
+    const pv = new BrowserWindow({ show: false, width: 900, height: 640, webPreferences: { offscreen: true } })
+    await pv.loadURL('data:text/html;base64,' + Buffer.from(html).toString('base64'))
+    await new Promise((r) => setTimeout(r, 500))
+    out('build/icon-preview.png', (await pv.webContents.capturePage()).toPNG())
+  }
+  app.quit()
+})
