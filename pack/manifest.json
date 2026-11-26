@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "name": "Vasya Family S1",
-  "packVersion": "20261125T182052",
-  "generatedAt": "2026-11-25T18:20:52.744Z",
+  "packVersion": "20261126T225107",
+  "generatedAt": "2026-11-26T22:51:07.414Z",
   "minecraft": "1.20.1",
   "loader": {
     "type": "fabric",
@@ -117,27 +117,6 @@
         "type": "modrinth",
         "projectId": "MBAkmtvl",
         "versionId": "R0jLIYXC"
-      }
-    },
-    {
-      "id": "bbs",
-      "name": "BBS mod",
-      "version": "2.5-1.20.1",
-      "file": "bbs-2.5-1.20.1.jar",
-      "size": 11065737,
-      "sha1": "caec5b4c1e434ad451e7e9eb492b1669dcd21044",
-      "sha512": "68afda6395eee50de820c0102ef38a1f07968cb643cef21fd715c37f1625d3834114b63fbd85069c7c6ce6bb766738288a1d47098c79ef862b9f3cae374c5716",
-      "side": "both",
-      "optional": false,
-      "default": true,
-      "requires": [],
-      "downloads": [
-        "https://cdn.modrinth.com/data/HNsMvuaQ/versions/c3LSNIIH/bbs-2.5-1.20.1.jar"
-      ],
-      "source": {
-        "type": "modrinth",
-        "projectId": "HNsMvuaQ",
-        "versionId": "c3LSNIIH"
       }
     },
     {
@@ -575,6 +554,27 @@
         "type": "modrinth",
         "projectId": "HJetCzWo",
         "versionId": "sMjnKy5B"
+      }
+    },
+    {
+      "id": "vinery",
+      "name": "[Let's Do] Vinery",
+      "version": "1.4.41",
+      "file": "letsdo-vinery-fabric-1.4.41.jar",
+      "size": 3043160,
+      "sha1": "3e65b576e50b6c1ffdd8213ecc43bf91f1477785",
+      "sha512": "b2af162ea4f41aefbdeed997777ac3080b43ae76b847344a4117ae69a0de579b3157ab0c3ccbdac89964d87f596aee3b79426ea2a89cad08a82a676f7fd68808",
+      "side": "both",
+      "optional": false,
+      "default": true,
+      "requires": [],
+      "downloads": [
+        "https://cdn.modrinth.com/data/1DWmBJVA/versions/Xv8zHKzi/letsdo-vinery-fabric-1.4.41.jar"
+      ],
+      "source": {
+        "type": "modrinth",
+        "projectId": "1DWmBJVA",
+        "versionId": "Xv8zHKzi"
       }
     },
     {
