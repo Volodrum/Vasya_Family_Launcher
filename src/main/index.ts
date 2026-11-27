@@ -8,6 +8,7 @@ import { fetchManifest, selectMods } from './manifest'
 import { syncMods } from './mods'
 import { syncPacks } from './packs'
 import { MENU_PACK, writeMenu } from './menu'
+import { unifyJourneyMapWorlds } from './journeymap'
 import { ensureJava, ensureMinecraft, launchGame } from './game'
 import { paths } from './paths'
 import { THEMES, type ThemeId } from '../shared/theme'
@@ -124,6 +125,13 @@ async function play(mode: PlayMode | 'repair'): Promise<void> {
       await writeMenu(paths.instance, { theme: settings.theme, language: settings.language, address: server.address })
     } catch (e) {
       console.warn('[menu]', (e as Error).message)
+    }
+    // One JourneyMap map per server world, whichever connection or join path was used.
+    try {
+      const jm = await unifyJourneyMapWorlds(paths.instance, m.servers.map((s) => s.address))
+      if (jm.merged.length || jm.linked.length) console.log('[journeymap] merged', jm.merged, 'linked', jm.linked)
+    } catch (e) {
+      console.warn('[journeymap]', (e as Error).message)
     }
 
     if (mode === 'repair') {
